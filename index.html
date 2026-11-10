@@ -446,6 +446,7 @@ h2{margin:34px 0 12px}
 .ystep span{font-size:12px;color:var(--muted)}
 .ystep b{font-size:17px;color:#FFE7B8}
 .yarr{color:rgba(255,231,184,.5);font-size:16px}
+.btn.ghost.addcat{display:block;padding:14px 0 18px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -469,6 +470,7 @@ function migrate(){
   if(S.startTotal==null) S.startTotal=consumerTotal();
   if(S.name===undefined&&SEED.name) S.name=SEED.name;
   if(S.livingBudget==null) S.livingBudget=60000;
+  if(!S.mpAdded){ if(!S.expenses.some(e=>/маркетплейс/i.test(e.name))) S.expenses.push({id:'e9',name:'Маркетплейсы',amount:0,every:1}); S.mpAdded=true; }
   if(!S.trackFrom) S.trackFrom=(S.noDebtSince||ymd(today())).slice(0,7);
   const sf=S.expenses.find(e=>e.name==='Серфинг (5 000/нед)'); if(sf) sf.name='Серфинг';
   const t=S.debts.find(d=>d.id==='tink'); if(t&&t.color==='#2B2B2B') t.color='#FFDD2D';
@@ -935,7 +937,7 @@ function vPlan(){
   ord.forEach((d,i)=>{ h+=`<div class="item"><div class="ico" style="background:${d.color}">${i+1}</div><div class="t"><b>${esc(d.name)}</b><span>${d.apr?fmtApr(d.apr):'0%'} · ${rub(d.balance)}${d.noPrepay?' · по графику':''}</span></div><div style="text-align:right"><b>${sim.closed[d.id]?mShort(sim.closed[d.id]):'—'}</b><div class="small muted">${S.plan.mode!=='calm'&&base.closed[d.id]&&base.closed[d.id]!==sim.closed[d.id]?'было '+mShort(base.closed[d.id]):''}</div></div></div>`;});
   h+=`</div>`;
   const SEGC={cr:'#2C8C9C',pe:'#8A6FD1',li:'rgba(233,247,246,.28)',pr:'#6FE6EA',fr:'rgba(107,227,201,.0)'};
-  h+=`<h2>Куда уходит зарплата</h2><div class="small muted" style="margin:-4px 0 10px">Каждая полоска — доход месяца. Видно, хватает ли денег и сколько идёт в досрочку.</div>
+  h+=`<h2 id="months">Куда уходит зарплата</h2><div class="small muted" style="margin:-4px 0 10px">Каждая полоска — доход месяца. Видно, хватает ли денег и сколько идёт в досрочку.</div>
   <div class="legend"><span><i style="background:${SEGC.cr}"></i>кредиты</span><span><i style="background:${SEGC.pe}"></i>личные</span><span><i style="background:${SEGC.li}"></i>жизнь</span><span><i style="background:${SEGC.pr}"></i>досрочно</span><span><i class="lfree"></i>остаётся</span></div>
   <div class="card" style="padding:8px 20px">`;
   sim.rows.slice(0,monthsOpen?12:6).forEach((r,ix)=>{ const inc=r.inc||1; const parts=[['cr',r.mandatory],['pe',r.personal],['li',r.live],['pr',r.prepaid]]; const used=parts.reduce((s,p)=>s+p[1],0); const over=used>inc;
@@ -974,7 +976,7 @@ function vMe(){
   S.expenses.forEach((e,ix)=>{const paused=!expActive(e,ym(t)); const sp=spentFor(e.id,mk); const n=(S.spend||[]).filter(x=>x.exp===e.id&&x.date.slice(0,7)===mk).length;
     const sub=[n?n+' '+plural(n,'запись','записи','записей'):'пока нет записей'];
     h+=`<div class="item tap" onclick="openExpense(${ix})"><div class="t"><b>${esc(e.name)}</b><span>${sub.join(' · ')}</span></div><b class="num ${sp?'':'muted'}" style="${sp?'':'color:var(--muted);font-weight:500'}">${fmt(sp)} ₽</b></div>`});
-  h+=`<button class="btn ghost" onclick="addExpense()">+ Добавить категорию</button></div>`;
+  h+=`<button class="btn ghost addcat" onclick="addExpense()">+ Добавить категорию</button></div>`;
   h+=`<h2>Данные</h2><div class="card small"><p style="margin-top:0">Всё хранится только на этом устройстве. Сохрани копию, чтобы не потерять.</p><p class="muted" style="margin-top:-4px">Сейчас: ${dataSummary()}</p>
    <div class="row" style="gap:8px"><button class="btn sec block" onclick="copyBackup()">Сохранить копию</button><button class="btn sec block" onclick="openRestore()">Восстановить</button></div>
    <button class="btn sec block" style="margin-top:12px" onclick="icsExport()">📅 Напоминания о платежах в Календарь</button><button class="btn ghost" style="color:var(--danger)" onclick="openReset()">Стереть все данные</button></div>`;
@@ -1009,6 +1011,13 @@ function openExpense(ix){const e=S.expenses[ix];
    ${recs.length?recs.map(r=>`<div class="item" style="padding:8px 0"><div class="t"><b class="num">${fmt(r.amount)} ₽</b><span>${parseD(r.date).getDate()} ${MONTHS[parseD(r.date).getMonth()]}${r.note?' · '+esc(r.note):''}</span></div><button class="btn ghost" style="color:var(--muted);padding:6px" onclick="delSpend('${r.id}',${ix})" aria-label="удалить">✕</button></div>`).join(''):'<div class="small muted" style="padding:8px 0 6px">Пока нет записей в этом месяце</div>'}</div>
    ${av!=null?`<div class="small muted" style="margin:4px 2px 10px">В среднем за прошлые месяцы: <b style="color:var(--text)">${rub(av)}</b></div>`:''}
   <button class="btn ghost block" style="color:var(--danger)" onclick="if(this.dataset.c){S.expenses.splice(${ix},1);save();closeSheet();render()}else{this.dataset.c=1;this.textContent='Удалить категорию и её записи?'}">Удалить категорию</button>`)}
+function monthSummary(){const r=planSim().rows[0]; if(!r) return ''; const t=today();
+  const debts=r.mandatory+r.personal; const scale=Math.max(r.inc,debts+r.live+r.prepaid)||1;
+  const st=r.free<0?`<span class="mst bad">не хватает ${fmt(-r.free)} ₽</span>`:r.free<S.plan.buffer-500?`<span class="mst warm">впритык · ${fmt(r.free)} ₽</span>`:`<span class="mst ok">остаётся ${fmt(r.free)} ₽</span>`;
+  return `<h2>${cap(MONTHS_N[t.getMonth()])} в целом</h2><div class="card tap-sum" onclick="go('plan');setTimeout(()=>{const e=document.getElementById('months');e&&e.scrollIntoView({behavior:'smooth',block:'start'})},60)" style="cursor:pointer">
+   <div class="row"><span class="small muted">доход ${fmt(r.inc)} → долги ${fmt(debts)} → жизнь ${fmt(r.live)}${r.prepaid?' → досрочно '+fmt(r.prepaid):''}</span></div>
+   <div class="mbar ${r.free<0?'over':''}" style="margin-top:12px"><i style="width:${(r.mandatory/scale*100).toFixed(1)}%;background:#2C8C9C"></i><i style="width:${(r.personal/scale*100).toFixed(1)}%;background:#8A6FD1"></i><i style="width:${(r.live/scale*100).toFixed(1)}%;background:rgba(233,247,246,.28)"></i><i style="width:${(r.prepaid/scale*100).toFixed(1)}%;background:#6FE6EA"></i></div>
+   <div class="row" style="margin-top:12px">${st}<span class="link">По месяцам →</span></div></div>`}
 function budgetCard(){const t=today(); const sp=spentMonth(ym(t)); const b=budget(); const pct=b?Math.min(100,sp/b*100):0; const over=sp>b;
   const daysLeft=dim(t.getFullYear(),t.getMonth())-t.getDate()+1;
   return `<div class="card tapcard" onclick="openBudget()" style="cursor:pointer"><div class="row"><div><div class="lbl">${cap(MONTHS_N[t.getMonth()])}</div><div class="mid num">${fmt(sp)} <span class="small muted">из ${fmt(b)} ₽</span></div></div><span class="pill">изменить</span></div>
