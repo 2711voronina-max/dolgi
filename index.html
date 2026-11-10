@@ -471,7 +471,7 @@ function migrate(){
   if(S.name===undefined&&SEED.name) S.name=SEED.name;
   if(S.livingBudget==null) S.livingBudget=60000;
   if(!S.mpAdded){ if(!S.expenses.some(e=>/маркетплейс/i.test(e.name))) S.expenses.push({id:'e9',name:'Маркетплейсы',amount:0,every:1}); S.mpAdded=true; }
-  if(!S.trackFrom) S.trackFrom=(S.noDebtSince||ymd(today())).slice(0,7);
+  if(!S.trackFrom){const n=new Date(); S.trackFrom=S.noDebtSince?S.noDebtSince.slice(0,7):n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');}
   const sf=S.expenses.find(e=>e.name==='Серфинг (5 000/нед)'); if(sf) sf.name='Серфинг';
   const t=S.debts.find(d=>d.id==='tink'); if(t&&t.color==='#2B2B2B') t.color='#FFDD2D';
   const y=S.debts.find(d=>d.id==='ya'); if(y&&y.color==='#E8B517') y.color='#1F1F23';
@@ -1209,6 +1209,9 @@ function icsExport(){
   setTimeout(()=>URL.revokeObjectURL(url),60000); toast('Открой файл — платежи добавятся в Календарь');
 }
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+// пустое состояние и неотменяемое приветствие
+const _vHome=vHome; vHome=function(){ if(!S.debts.length) return `<div class="daterow"><div class="sub date">Добро пожаловать</div></div>`+header('<span class="acc">Привет!</span>','','home nochip')+`<div class="card frost" id="emptyCard" style="margin-top:20px"><b>Данных пока нет</b><div class="small" style="margin-top:6px;line-height:1.5">Перенеси копию из прототипа: там «Профиль» → «Сохранить копию», а здесь вставь текст.</div><button class="btn block" style="margin-top:14px" onclick="onboarding()">Перенести данные</button><button class="btn ghost block" onclick="go('me')">Начать с нуля в «Профиле»</button></div>`; return _vHome(); };
+document.getElementById('sheetbg').addEventListener('click',e=>{ if(e.target.id==='sheetbg'&&S.fresh){ e.stopImmediatePropagation(); }},true);
 if(!S.noDebtSince){S.noDebtSince=ymd(today());save()}
 render();
 if(S.fresh) onboarding();
