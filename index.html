@@ -380,11 +380,21 @@ const SEED={version:2,startTotal:null,noDebtSince:null,savedByStop:0,wishes:[],a
 let S=load();
 function load(){try{const r=localStorage.getItem(STORE_KEY);if(r)return JSON.parse(r)}catch(e){}return JSON.parse(JSON.stringify(SEED))}
 function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(S))}catch(e){}}
-if(S.startTotal==null){S.startTotal=consumerTotal();save()}
-if(S.name===undefined&&SEED.name){S.name=SEED.name;save()}
-if(S.livingBudget==null){S.livingBudget=60000;save()}
-{const sf=S.expenses.find(e=>e.name==='Серфинг (5 000/нед)'); if(sf){sf.name='Серфинг';save()}}
-{const t=S.debts.find(d=>d.id==='tink'); if(t&&t.color==='#2B2B2B'){t.color='#FFDD2D';save()} const y=S.debts.find(d=>d.id==='ya'); if(y&&y.color==='#E8B517'){y.color='#1F1F23';save()}}
+function migrate(){
+  S.debts=S.debts||[];S.expenses=S.expenses||[];S.income=S.income||[];S.paid=S.paid||{};S.actual=S.actual||{};S.spend=S.spend||[];S.wishes=S.wishes||[];
+  S.plan=Object.assign({strategy:'avalanche',mode:'balanced',buffer:10000},S.plan||{});
+  if(S.startTotal==null) S.startTotal=consumerTotal();
+  if(S.name===undefined&&SEED.name) S.name=SEED.name;
+  if(S.livingBudget==null) S.livingBudget=60000;
+  const sf=S.expenses.find(e=>e.name==='Серфинг (5 000/нед)'); if(sf) sf.name='Серфинг';
+  const t=S.debts.find(d=>d.id==='tink'); if(t&&t.color==='#2B2B2B') t.color='#FFDD2D';
+  const y=S.debts.find(d=>d.id==='ya'); if(y&&y.color==='#E8B517') y.color='#1F1F23';
+  save();
+}
+migrate();
+function dataSummary(d){d=d||S;const n=(d.debts||[]).length,c=(d.expenses||[]).length,sp=(d.spend||[]).length,p=Object.keys(d.paid||{}).length;return `${n} ${plural(n,'долг','долга','долгов')} · ${c} ${plural(c,'категория','категории','категорий')} · ${sp} ${plural(sp,'расход','расхода','расходов')} · ${p} ${plural(p,'отметка','отметки','отметок')} об оплате`}
+function importText(txt){const d=JSON.parse(txt.trim());if(!d||!Array.isArray(d.debts))throw new Error('bad');S=d;delete S.fresh;migrate();return dataSummary()}
+async function pasteInto(id){try{const t=await navigator.clipboard.readText();document.getElementById(id).value=t;toast('Вставлено')}catch(e){toast('Не получилось — нажми в поле и выбери «Вставить»')}}
 
 /* ================== Утилиты ================== */
 const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Math.round(n));
@@ -858,7 +868,7 @@ function vMe(){
     const sub=[n?n+' '+plural(n,'запись','записи','записей'):'пока нет записей'];
     h+=`<div class="item tap" onclick="openExpense(${ix})"><div class="t"><b>${esc(e.name)}</b><span>${sub.join(' · ')}</span></div><b class="num ${sp?'':'muted'}" style="${sp?'':'color:var(--muted);font-weight:500'}">${fmt(sp)} ₽</b></div>`});
   h+=`<button class="btn ghost" onclick="addExpense()">+ Добавить категорию</button></div>`;
-  h+=`<h2>Данные</h2><div class="card small"><p style="margin-top:0">Всё хранится только на этом устройстве. Сохрани копию, чтобы не потерять.</p>
+  h+=`<h2>Данные</h2><div class="card small"><p style="margin-top:0">Всё хранится только на этом устройстве. Сохрани копию, чтобы не потерять.</p><p class="muted" style="margin-top:-4px">Сейчас: ${dataSummary()}</p>
    <div class="row" style="gap:8px"><button class="btn sec block" onclick="copyBackup()">Сохранить копию</button><button class="btn sec block" onclick="openRestore()">Восстановить</button></div>
    <button class="btn sec block" style="margin-top:12px" onclick="icsExport()">📅 Напоминания о платежах в Календарь</button><button class="btn ghost" style="color:var(--danger)" onclick="openReset()">Стереть все данные</button></div>`;
   return h;
@@ -900,9 +910,11 @@ function budgetCard(){const t=today(); const sp=spentMonth(ym(t)); const b=budge
 function openBudget(){sheet(`<h2>Бюджет на жизнь</h2><div class="small muted" style="line-height:1.45">Одна сумма в месяц на всё, кроме долгов: еда, связь, спорт, красота, рестораны. Её план по погашению откладывает каждый месяц. Если потратишь больше — прогноз пересчитается сам.</div>
   <label class="f" style="margin-top:14px"><span>В месяц, ₽</span><input id="bg" inputmode="numeric" value="${budget()}"></label>
   <button class="btn block" onclick="S.livingBudget=num(bg.value);save();closeSheet();render();toast('Бюджет обновлён, план пересчитан')">Сохранить</button>`)}
-function copyBackup(){const t=JSON.stringify(S);try{navigator.clipboard.writeText(t).then(()=>toast('Скопировано — вставь в Заметки'),()=>showBackup(t))}catch(e){showBackup(t)}}
-function showBackup(t){sheet(`<h2>Резервная копия</h2><p class="small muted">Выдели и скопируй текст:</p><textarea readonly>${esc(t)}</textarea>`)}
-function openRestore(){sheet(`<h2>Восстановить</h2><textarea id="rt" placeholder="Вставь сюда копию"></textarea><button class="btn block" style="margin-top:10px" onclick="try{S=JSON.parse(rt.value);save();closeSheet();render();toast('Восстановлено')}catch(e){toast('Не получилось прочитать')}">Восстановить</button>`)}
+function copyBackup(){const t=JSON.stringify(S);
+  const done=()=>toast('Скопировано: '+dataSummary());
+  try{navigator.clipboard.writeText(t).then(done,()=>showBackup(t))}catch(e){showBackup(t)}}
+function showBackup(t){sheet(`<h2>Резервная копия</h2><div class="small muted" style="line-height:1.45">${dataSummary()}. Нажми «Скопировать» — весь текст попадёт в буфер обмена.</div><textarea id="bk" readonly style="margin-top:10px">${esc(t)}</textarea><button class="btn block" style="margin-top:10px" onclick="const a=document.getElementById('bk');a.focus();a.select();a.setSelectionRange(0,a.value.length);let ok=false;try{ok=document.execCommand('copy')}catch(e){};toast(ok?'Скопировано':'Выдели текст вручную и скопируй')">Скопировать</button>`)}
+function openRestore(){sheet(`<h2>Восстановить</h2><textarea id="rt" placeholder="Вставь сюда копию"></textarea><button class="btn sec block" style="margin-top:10px" onclick="pasteInto('rt')">Вставить из буфера</button><button class="btn block" onclick="try{const m=importText(rt.value);closeSheet();render();toast('Перенесено: '+m)}catch(e){toast('Копия неполная или повреждена — скопируй ещё раз')}">Восстановить</button>`)}
 function openReset(){sheet(`<h2>Сбросить данные?</h2><p class="muted">Все долги, отметки и настройки удалятся с этого телефона. Сначала сохрани копию.</p><button class="btn danger block" onclick="S=JSON.parse(JSON.stringify(SEED));S.startTotal=0;save();closeSheet();render();onboarding()">Стереть</button>`)}
 
 /* ================== Стоп-кран ================== */
@@ -1054,7 +1066,8 @@ new MutationObserver(fixIcons).observe(document.body,{childList:true,subtree:tru
 function onboarding(){
   sheet(`<h2>Добро пожаловать 👋</h2><div class="small muted" style="line-height:1.5">Все данные хранятся только на этом телефоне — никуда не отправляются.</div><label class="f"><span>Как тебя зовут?</span><input id="obn" placeholder="Имя"></label>
   <div class="card" style="margin-top:14px"><b>Перенести из прототипа</b><div class="small muted" style="margin:6px 0 10px;line-height:1.45">В прототипе открой «Профиль» → «Сохранить копию», затем вставь текст сюда.</div><textarea id="ob" placeholder="Вставь копию"></textarea>
-  <button class="btn block" style="margin-top:12px" onclick="try{const d=JSON.parse(ob.value);if(!d.debts)throw 0;S=d;if(obn.value)S.name=obn.value.trim();delete S.fresh;save();closeSheet();render();toast('Данные перенесены')}catch(e){toast('Не получилось прочитать копию')}">Перенести</button></div>
+  <button class="btn sec block" style="margin-top:10px" onclick="pasteInto('ob')">Вставить из буфера</button>
+  <button class="btn block" onclick="try{const nm=obn.value.trim();const m=importText(ob.value);if(nm)S.name=nm;save();closeSheet();render();toast('Перенесено: '+m)}catch(e){toast('Копия неполная или повреждена — скопируй ещё раз')}">Перенести</button></div>
   <button class="btn ghost block" onclick="if(obn.value)S.name=obn.value.trim();delete S.fresh;save();closeSheet();go('me');toast('Начни с дохода и долгов')">Начать с нуля</button>`);
 }
 /* ===== Календарь (.ics) ===== */
