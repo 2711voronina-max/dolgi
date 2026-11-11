@@ -502,6 +502,32 @@ h2{margin:34px 0 12px}
 .avatar{width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;flex:none;display:grid;place-items:center;font:700 16px var(--font);color:#fff;
   background:linear-gradient(135deg,#1F7A87,#2C97A1);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 16px -6px rgba(0,0,0,.6)}
 .backbtn{background:none;border:0;color:var(--accent);font:500 16px var(--font);padding:0 0 6px;cursor:pointer}
+.acc-acts{display:flex;justify-content:space-between;gap:10px;margin-top:12px}
+.acc-acts .gbtn.icon{width:44px;height:44px;padding:0;display:grid;place-items:center}
+.acc-acts .gbtn.icon svg{width:20px;height:20px}
+.acc-acts .gbtn.add{color:#6FE6EA}
+.acc-acts .gbtn.trash{color:var(--muted)}
+.acc-acts .gbtn.trash.confirm{width:auto;padding:0 16px;color:var(--danger);font-size:14px;font-weight:600}
+.accbody .item .btn.ghost svg{width:18px;height:18px;display:block}
+/* категории чипсами + быстрый ввод */
+.catchips{display:flex;flex-wrap:wrap;gap:8px}
+.catchips::-webkit-scrollbar{display:none}
+.cchip{padding:8px 13px;gap:6px;white-space:nowrap;font-size:14px}
+.cchip b{font-size:14px!important}
+.cchip b{font-size:15px;font-weight:600}
+.cchip span{font-size:13px;color:var(--muted)}
+.cchip.addc{width:38px;height:38px;padding:0;justify-content:center;color:#6FE6EA}
+.cchip.addc svg{width:18px;height:18px}
+.cchip.addc.on{color:#fff}
+.qadd{display:flex;gap:8px;margin-top:14px;align-items:center}
+.qadd input{flex:1;min-width:0;height:48px;margin:0;padding:0 14px;font-size:17px}
+.qadd input.qnote{flex:1.1;font-size:15px}
+.qbtn{flex:none;width:48px;height:48px;border:0;border-radius:50%;display:grid;place-items:center;background:var(--grad);color:#fff;cursor:pointer;box-shadow:0 6px 18px -8px rgba(79,227,203,.7)}
+.qbtn svg{width:22px;height:22px}
+.qrecs{margin-top:8px}
+.qrecs .btn.ghost svg,.delcat svg{width:18px;height:18px;display:block}
+.delcat{color:var(--muted)!important;padding:6px 4px}
+.delcat.confirm{color:var(--danger)!important;font-size:14px;font-weight:600}
 </style>
 </head>
 <body>
@@ -712,6 +738,8 @@ const I={
  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14l2 2 4-4"/></svg>',
  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M3.5 9.5h17M7 15h4"/></svg>',
  plan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19 9.5 12l4 3.5L20 6"/><path d="M15 6h5v5"/></svg>',
+ trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',
+ plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
  more:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>',
 };
 const TABS=[['home','Главная','home'],['pay','Платежи','cal'],['debts','Долги','list'],['plan','План','plan'],['me','Профиль','more']];
@@ -721,7 +749,9 @@ window.addEventListener('hashchange',()=>{const t=location.hash.slice(1); if(ALL
 function go(t){tab=t;try{history.replaceState(null,'','#'+t)}catch(e){} render(); window.scrollTo(0,0)}
 function render(){
   document.getElementById('tabs').innerHTML=TABS.map(([id,n,ic])=>`<button class="${tab===id?'on':''}" onclick="go('${id}')">${I[ic]}${n}</button>`).join('');
+  const cc0=document.querySelector('.catchips'); const csl=cc0?cc0.scrollLeft:0;
   document.getElementById('view').innerHTML=({home:vHome,pay:vPay,debts:vDebts,plan:vPlan,me:vMe}[tab])();
+  const cc1=document.querySelector('.catchips'); if(cc1) cc1.scrollLeft=csl;
   const fc=document.getElementById('fullcal'); if(fc&&fc.classList.contains('open')) openCal();
 }
 function pdn(withHoliday){
@@ -1030,13 +1060,16 @@ function vMe(){
    <button class="btn sec block" style="margin-top:12px" onclick="icsExport()">📅 Напоминания о платежах в Календарь</button><button class="btn ghost" style="color:var(--danger)" onclick="openReset()">Стереть все данные</button></div>`;
   return h;
 }
-let openCat=null;
+let openCat=null, newCatMode=false;
+function addCatInline(){const n=(document.getElementById('ncn').value||'').trim(); if(!n){toast('Как назовём категорию?');return}
+  const id='e'+Date.now(); S.expenses.push({id,name:n,amount:0,every:1}); newCatMode=false; openCat=id; save(); render(); toast('Категория «'+n+'» добавлена'); setTimeout(()=>{const i=document.getElementById('qa');i&&i.focus()},50)}
+function quickSpend(eid){const i=document.getElementById('qa'); const a=num(i.value); if(!a){toast('Введи сумму');i.focus();return}
+  recordSpend(eid,a,ymd(today()),'')}
 function toggleCat(id){openCat=openCat===id?null:id;render()}
 function catDetail(e,ix,ps,pe){const mk=ym(today()); const recs=(S.spend||[]).filter(x=>x.exp===e.id&&(ps?(x.date>=ps&&x.date<=pe):x.date.slice(0,7)===mk)).sort((a,b)=>a.date<b.date?1:-1); const av=avgActual(e);
-  return `<div class="accbody">${recs.length?recs.map(r=>`<div class="item" style="padding:9px 0"><div class="t"><b class="num">${fmt(r.amount)} ₽</b><span>${parseD(r.date).getDate()} ${MONTHS[parseD(r.date).getMonth()]}${r.note?' · '+esc(r.note):''}</span></div><button class="btn ghost" style="color:var(--muted);padding:6px 4px" onclick="event.stopPropagation();S.spend=S.spend.filter(x=>x.id!=='${r.id}');save();render()" aria-label="удалить">✕</button></div>`).join(''):'<div class="small muted" style="padding:6px 0">Пока нет записей за период</div>'}
+  return `<div class="accbody">${recs.length?recs.map(r=>`<div class="item" style="padding:9px 0"><div class="t"><b class="num">${fmt(r.amount)} ₽</b><span>${parseD(r.date).getDate()} ${MONTHS[parseD(r.date).getMonth()]}${r.note?' · '+esc(r.note):''}</span></div><button class="btn ghost" style="color:var(--muted);padding:6px 4px" onclick="event.stopPropagation();S.spend=S.spend.filter(x=>x.id!=='${r.id}');save();render()" aria-label="Удалить запись">${I.trash}</button></div>`).join(''):'<div class="small muted" style="padding:6px 0">Пока нет записей за период</div>'}
    ${av!=null?`<div class="small muted" style="margin-top:6px">В среднем за прошлые месяцы: <b style="color:var(--text)">${rub(av)}</b></div>`:''}
-   <button class="btn block" style="margin-top:12px" onclick="openSpend('${e.id}')">Добавить расход</button>
-   <button class="btn ghost block" style="color:var(--danger);font-size:14px" onclick="if(this.dataset.c){S.expenses.splice(${ix},1);openCat=null;save();render()}else{this.dataset.c=1;this.textContent='Удалить категорию и её записи?'}">Удалить категорию</button></div>`}
+   <div class="acc-acts"><button class="gbtn icon trash" onclick="event.stopPropagation();if(this.dataset.c){S.expenses.splice(${ix},1);openCat=null;save();render();toast('Категория удалена')}else{this.dataset.c=1;this.classList.add('confirm');this.innerHTML='Удалить категорию?'}" aria-label="Удалить категорию">${I.trash}</button><button class="gbtn icon add" onclick="event.stopPropagation();openSpend('${e.id}')" aria-label="Добавить расход">${I.plus}</button></div></div>`}
 function openName(){sheet(`<h2>Имя</h2><label class="f"><span>Как к тебе обращаться</span><input id="nm" value="${esc(S.name||'')}"></label><button class="btn block" onclick="S.name=nm.value.trim();save();closeSheet();render()">Сохранить</button>`)}
 function openIncomePlan(){sheet(`<h2>Плановый доход</h2>${S.income.map((i,ix)=>`<label class="f"><span>${i.name}, ${i.day}-го</span><input id="ip${ix}" inputmode="numeric" value="${i.amount}"></label>`).join('')}<button class="btn block" onclick="S.income.forEach((i,ix)=>i.amount=num(document.getElementById('ip'+ix).value));save();closeSheet();render()">Сохранить</button>`)}
 function addExpense(){S.expenses.push({id:'e'+Date.now(),name:'',amount:0,every:1,fresh:true});save();render();openExpense(S.expenses.length-1)}
@@ -1045,14 +1078,16 @@ function openSpend(eid){
   if(eid) spendCat=eid; if(!spendCat||!S.expenses.find(e=>e.id===spendCat)) spendCat=(S.expenses[0]||{}).id;
   sheet(`<h2>Новый расход</h2><label class="f"><span>Сумма, ₽</span><input id="spa" inputmode="decimal" placeholder="0" autofocus></label>
   <div class="lbl" style="margin:6px 0 8px">Категория</div><div style="display:flex;flex-wrap:wrap;gap:8px">${S.expenses.map(e=>`<button class="chip ${spendCat===e.id?'on':''}" style="padding:8px 14px" onclick="spendCat='${e.id}';[...this.parentNode.children].forEach(b=>b.classList.remove('on'));this.classList.add('on')">${esc(e.name.split(' (')[0])}</button>`).join('')}</div>
-  <div class="grid2" style="margin-top:6px"><label class="f"><span>Дата</span><input id="spd" type="date" value="${ymd(today())}"></label><label class="f"><span>Заметка</span><input id="spn" placeholder="необязательно"></label></div>
+  <label class="f" style="margin-top:6px"><span>Дата</span><input id="spd" type="date" value="${ymd(today())}"></label>
   <button class="btn block" style="margin-top:6px" onclick="addSpend()">Записать</button>`);
   setTimeout(()=>{const i=document.getElementById('spa');i&&i.focus()},300);
 }
 function addSpend(){const a=num(spa.value); if(!a||!spendCat){toast('Укажи сумму');return}
+  closeSheet(); recordSpend(spendCat,a,spd.value||ymd(today()),'')}
+function recordSpend(eid,a,date,note){
   const per=periodOf(today()); const before=spendPace(per);
-  (S.spend=S.spend||[]).push({id:'s'+Date.now(),exp:spendCat,amount:a,date:spd.value||ymd(today()),note:spn.value.trim()});save();closeSheet();render();
-  const e=S.expenses.find(x=>x.id===spendCat); const sp=spentFor(e.id,ym(today())); const now=spendPace(per);
+  (S.spend=S.spend||[]).push({id:'s'+Date.now(),exp:eid,amount:a,date,note});save();render();
+  const e=S.expenses.find(x=>x.id===eid); const sp=spentFor(e.id,ym(today())); const now=spendPace(per);
   if(now.over&&!before.over){document.getElementById('toast').classList.remove('on');sheet(`<h2>Вышли за бюджет периода</h2><div class="small muted" style="line-height:1.5">Потрачено ${rub(now.spent)} из ${rub(now.bud)} до ${now.end}. ${willLeftNow()>=0?'Ничего страшного — план уже пересчитался: перерасход возьмём из денег на досрочку, а не в долг.':'К '+now.end+' не хватит '+rub(-willLeftNow())+'. Можно перенести гибкий личный платёж — подскажу в «Подсказках».'}</div><div class="note-y" style="margin-top:16px"><div class="ni">i</div><div style="flex:1;line-height:1.45">До ${now.end} — только самое нужное. Кредитки не трогаем.</div></div><button class="btn block" style="margin-top:8px" onclick="closeSheet()">Понятно</button>`);return}
   if(now.fast&&!before.fast){toast(`Траты идут быстрее плана · ~${rub(now.perDay)} в день до ${now.end}`);return}
   toast(`${pick(PRAISE.spend)} · ${e.name.split(' (')[0]}: ${fmt(sp)} ₽`)}
@@ -1113,13 +1148,19 @@ function periodCard(per,perKey){
      ${(()=>{const pc=spendPace(per);return pc.over||pc.fast?'':`<div class="small muted" style="margin-top:6px">можно ~${rub((bud-spent)/days)} в день до ${per.end.getDate()} ${MS[per.end.getMonth()]}</div>`})()}</div>
    </div>
    <div class="sep" style="margin:18px 0 6px"></div>
-   <div class="lbl" style="margin:8px 0 2px">Расходы по категориям</div>`;
-  const shown=allCats?cats:cats.filter(c=>c.sum>0||openCat===c.e.id); const hidden=cats.length-shown.length;
-  if(!shown.length) h+=`<div class="small muted" style="padding:8px 0">Пока нет расходов за период</div>`;
-  shown.forEach(({e,ix,sum,n})=>{ const open=openCat===e.id;
-    h+=`<div class="item tap acc-row ${open?'open':''}" onclick="toggleCat('${e.id}')"><div class="t"><b>${esc(e.name)}</b><span>${n?n+' '+plural(n,'запись','записи','записей'):'пока нет записей'}</span></div><b class="num" style="${sum?'':'color:var(--muted);font-weight:500'}">${fmt(sum)} ₽</b></div>${open?catDetail(e,ix,ps,pe):''}`;});
-  if(hidden>0||allCats) h+=`<button class="btn ghost" style="padding:12px 0 2px" onclick="allCats=!allCats;render()">${allCats?'Свернуть пустые':'Все категории · ещё '+hidden}</button>`;
-  h+=`<button class="btn block" style="margin-top:16px" onclick="openSpend()">Добавить расход</button>${allCats?'<button class="btn ghost addcat" onclick="addExpense()">+ Добавить категорию</button>':''}</div>`;
+   <div class="lbl" style="margin:8px 0 12px">Расходы по категориям</div>`;
+  if(!newCatMode&&(!openCat||!S.expenses.find(x=>x.id===openCat))) openCat=(cats.find(c=>c.sum>0)||cats[0]||{e:{}}).e.id||null;
+  h+=`<div class="catchips">${S.expenses.map((e,ix)=>{const c=cats.find(c=>c.e.id===e.id); const on=!newCatMode&&openCat===e.id;
+    return `<button class="chip cchip ${on?'on':''}" onclick="newCatMode=false;openCat='${e.id}';render()"><b>${esc(e.name.split(' (')[0])}</b>${c.sum?`<span class="num">${fmt(c.sum)}</span>`:''}</button>`}).join('')}<button class="chip cchip addc ${newCatMode?'on':''}" onclick="newCatMode=true;render();setTimeout(()=>{const i=document.getElementById('ncn');i&&i.focus()},50)" aria-label="Новая категория">${I.plus}</button></div>`;
+  if(newCatMode){
+    h+=`<div class="qadd"><input id="ncn" placeholder="Название категории" enterkeyhint="done" onkeydown="if(event.key==='Enter')addCatInline()"><button class="qbtn" onclick="addCatInline()" aria-label="Добавить категорию">${I.plus}</button></div><div class="small muted" style="margin-top:8px">Например, такси или подарки</div>`;
+  } else if(openCat){ const c=cats.find(c=>c.e.id===openCat); const e=c.e, ix=c.ix;
+    const recs=spendP.filter(x=>x.exp===e.id).sort((a,b)=>a.date<b.date?1:-1);
+    h+=`<div class="qadd"><input id="qa" inputmode="decimal" placeholder="Сумма, ₽" enterkeyhint="done" onkeydown="if(event.key==='Enter')quickSpend('${e.id}')"><button class="qbtn" onclick="quickSpend('${e.id}')" aria-label="Записать расход">${I.plus}</button></div>`;
+    h+=recs.length?`<div class="qrecs">${recs.map(r=>`<div class="item" style="padding:9px 0"><div class="t"><b class="num">${fmt(r.amount)} ₽</b><span>${parseD(r.date).getDate()} ${MONTHS[parseD(r.date).getMonth()]}${r.note?' · '+esc(r.note):''}</span></div><button class="btn ghost" style="color:var(--muted);padding:6px 4px" onclick="S.spend=S.spend.filter(x=>x.id!=='${r.id}');save();render()" aria-label="Удалить запись">${I.trash}</button></div>`).join('')}</div>`:`<div class="small muted" style="padding:12px 0 2px">Здесь пока пусто — первая трата за период появится списком</div>`;
+    h+=`<div class="row" style="margin-top:10px"><span class="small muted">${c.sum?'Итого за период: <b class="num" style="color:var(--text)">'+rub(c.sum)+'</b>':''}</span><button class="btn ghost delcat" onclick="if(this.dataset.c){S.expenses.splice(${ix},1);openCat=null;save();render();toast('Категория удалена')}else{this.dataset.c=1;this.classList.add('confirm');this.innerHTML='Удалить категорию?'}" aria-label="Удалить категорию">${I.trash}</button></div>`;
+  }
+  h+=`</div>`;
   return h;
 }
 function budgetCard(){const t=today(); const sp=spentMonth(ym(t)); const b=budget(); const pct=b?Math.min(100,sp/b*100):0; const over=sp>b;
