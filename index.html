@@ -1170,7 +1170,7 @@ function periodCard(per,perKey){
   const pctCr=due?Math.min(100,paid/due*100):100, pctSp=bud?Math.min(100,spent/bud*100):0, overSp=spent>bud;
   const cats=S.expenses.map((e,ix)=>({e,ix,sum:spendP.filter(x=>x.exp===e.id).reduce((s,x)=>s+x.amount,0),n:spendP.filter(x=>x.exp===e.id).length})).sort((a,b)=>b.sum-a.sum);
   let h=`<div class="card period"><div class="row"><div class="lbl">${per.inc.name} · ${per.start.getDate()}${per.start.getMonth()===per.end.getMonth()?"":" "+MS[per.start.getMonth()]}–${per.end.getDate()} ${MS[per.end.getMonth()]}</div><span class="ctag ${willLeft<0?'warm':'ok'}">${willLeft<0?'впритык':'хватает'}</span></div>${paceNote(spendPace(per),willLeft)}
-   <div class="row" style="margin-top:14px;align-items:flex-end"><div><div class="small muted">на руках сейчас</div><div class="num mid ${nowLeft<0?'neg':''}">${fmt(nowLeft)} ₽</div></div><div style="text-align:right"><div class="small muted">к ${per.end.getDate()} ${MS[per.end.getMonth()]} останется</div><div class="num" style="font-size:19px;font-weight:700;${willLeft<0?'color:var(--danger)':''}">${fmt(willLeft)} ₽</div></div></div>
+   <div class="row" style="margin-top:14px;align-items:flex-end"><div><div class="small muted">на руках сейчас</div><div class="num mid ${nowLeft<0?'neg':''}">${fmt(nowLeft)} ₽</div></div></div>
    <div class="flow" style="margin-top:18px">
     <div class="row"><span>Пришло ${fact?'<span class="pill ok">факт</span>':'<span class="pill">план</span>'}</span><b class="num pos edit" onclick="openIncome('${per.inc.id}','${perKey}')">+${fmt(got)} ₽</b></div>
     <div><div class="row"><span>Кредиты</span><b class="num">${fmt(paid)} ₽</b></div><div class="bar thin"><i style="width:${pctCr.toFixed(1)}%"></i></div></div>
