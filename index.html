@@ -447,6 +447,61 @@ h2{margin:34px 0 12px}
 .ystep b{font-size:17px;color:#FFE7B8}
 .yarr{color:rgba(255,231,184,.5);font-size:16px}
 .btn.ghost.addcat{display:block;padding:14px 0 18px;margin-top:4px}
+.inl{width:92px;display:inline-block;padding:2px 6px;margin:0 2px;border-radius:8px;font-size:13px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text);-webkit-backdrop-filter:none;backdrop-filter:none}
+.incrow{align-items:center}
+.factf{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.factf span{font-size:11px;color:var(--muted)}
+.factf input{width:120px;text-align:right;padding:10px 12px;font-weight:600}
+.acc-row::after{transform:translateY(-50%) rotate(135deg)!important;transition:transform .2s}
+.acc-row.open::after{transform:translateY(-50%) rotate(-45deg)!important}
+.acc-row.open{border-bottom:0}
+.accbody{padding:2px 0 14px 0;border-bottom:1px solid rgba(255,255,255,.06);animation:up .25s ease}
+.bar.thin{height:6px;margin-top:8px}
+.card.period .flow{gap:16px}
+.card.period .acc-row{padding:12px 22px 12px 0}
+.kv b{white-space:nowrap}
+.sheet{position:relative;transition:transform .2s}
+.sheetx{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:0;display:grid;place-items:center;font-size:15px;color:var(--text);cursor:pointer;z-index:2;
+  background:rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.2);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.sheet>h2:first-of-type{padding-right:44px}
+.sheetx{position:sticky;top:6px;float:right;margin:0 -4px -34px 0}
+.cele{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,10,14,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .25s}
+.cele.open{opacity:1;pointer-events:auto}
+.celecard{position:relative;width:100%;max-width:360px;text-align:center;padding:30px 24px 22px;border-radius:32px;
+  background:linear-gradient(160deg,rgba(111,230,234,.28),rgba(20,60,74,.92) 45%,rgba(10,30,40,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(85,220,227,.25);
+  transform:scale(.8) translateY(20px);transition:transform .45s cubic-bezier(.2,1.5,.4,1)}
+.cele.open .celecard{transform:none}
+.celecard .sheetx{position:absolute;float:none;margin:0;top:14px;right:14px}
+.celeemoji{font-size:64px;line-height:1;margin:6px 0 10px;animation:pop 1.2s cubic-bezier(.2,1.6,.4,1) both}
+.cele.big .celeemoji{font-size:84px}
+@keyframes pop{0%{transform:scale(.2) rotate(-20deg)}60%{transform:scale(1.15) rotate(6deg)}100%{transform:none}}
+.celecard h2{margin:6px 0 8px;font-size:26px;color:#fff}
+.celetext{font-size:16px;line-height:1.5;color:rgba(233,247,246,.88)}
+.celestat{margin:16px auto 18px;display:inline-block;padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.1);font-size:14px;font-weight:600;color:#BFF6F2}
+.confetti{position:fixed;inset:0;width:100%;height:100%;z-index:41;pointer-events:none}
+.btn.ghost.addcat{width:100%;text-align:center}
+.hero-res{padding:24px 22px 20px;background:linear-gradient(150deg,rgba(111,230,234,.22),rgba(22,58,78,.5) 55%,rgba(14,34,52,.6))}
+.hero-big{font-size:36px;font-weight:800;letter-spacing:-.025em;color:#fff;margin-top:6px;line-height:1.1}
+.hero-gain{font-size:15px;color:#7BE7E4;margin-top:6px;font-weight:600}
+.hero-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
+.hero-row>div{display:flex;flex-direction:column;gap:4px}
+.hero-row b{font-size:17px;font-weight:700;white-space:nowrap}
+.hero-row span{font-size:12px;color:var(--muted);line-height:1.3}
+/* строки выбора линии на графике: не шеврон, а индикатор выбора */
+.item.rsel{padding-right:32px!important}
+.item.rsel::after{width:16px;height:16px;border:2px solid rgba(233,247,246,.3)!important;border-radius:50%;transform:translateY(-50%)!important;right:4px;box-sizing:border-box}
+.item.rsel.on::after{border-color:var(--accent)!important;background:radial-gradient(circle,var(--accent) 0 4px,transparent 5px)}
+.item.rsel.on{margin:0;padding-left:0!important;background:none}
+.item.rsel.on b{color:var(--accent)}
+/* спокойнее главный результат плана */
+.hero-res{padding:20px 20px 18px;background:var(--card-fill)}
+.hero-big{font-size:26px;font-weight:700;letter-spacing:-.015em;margin-top:4px}
+.hero-gain{font-size:14px;font-weight:500;color:rgba(123,231,228,.85);margin-top:4px}
+.hero-row{margin-top:16px;padding-top:14px}
+.hero-row b{font-size:16px;font-weight:600}
+.avatar{width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;flex:none;display:grid;place-items:center;font:700 16px var(--font);color:#fff;
+  background:linear-gradient(135deg,#1F7A87,#2C97A1);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 16px -6px rgba(0,0,0,.6)}
+.backbtn{background:none;border:0;color:var(--accent);font:500 16px var(--font);padding:0 0 6px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -557,7 +612,8 @@ function togglePaidKey(k){
   let amt, principal;
   if(d.kind==='personal'){ amt=(d.schedule.find(s=>s.m===ds)||{a:0}).a; principal=Math.min(amt,d.balance); }
   else { amt=Math.min(d.payment,d.balance||d.payment); principal=Math.max(0,Math.min(d.balance,amt-interestMonthly(d))); }
-  d.balance-=principal; S.paid[k]={d:principal,amt,at:ymd(today())}; save(); render(); toast('Отмечено ✓');
+  const before=d.balance; d.balance-=principal; S.paid[k]={d:principal,amt,at:ymd(today())}; save(); render();
+  afterPay(d,before,amt);
 }
 function upcoming(){
   const t=today(); const from=new Date(t.getFullYear(),t.getMonth()-1,1);
@@ -659,8 +715,9 @@ const I={
  more:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>',
 };
 const TABS=[['home','Главная','home'],['pay','Платежи','cal'],['debts','Долги','list'],['plan','План','plan'],['me','Профиль','more']];
-let tab=(location.hash||'#home').slice(1); if(!TABS.some(t=>t[0]===tab)) tab='home';
-window.addEventListener('hashchange',()=>{const t=location.hash.slice(1); if(TABS.some(x=>x[0]===t)){tab=t;render();}});
+const ALLVIEWS=['home','pay','debts','plan','me'];
+let tab=(location.hash||'#home').slice(1); if(!ALLVIEWS.includes(tab)) tab='home';
+window.addEventListener('hashchange',()=>{const t=location.hash.slice(1); if(ALLVIEWS.includes(t)){tab=t;render();}});
 function go(t){tab=t;try{history.replaceState(null,'','#'+t)}catch(e){} render(); window.scrollTo(0,0)}
 function render(){
   document.getElementById('tabs').innerHTML=TABS.map(([id,n,ic])=>`<button class="${tab===id?'on':''}" onclick="go('${id}')">${I[ic]}${n}</button>`).join('');
@@ -704,15 +761,7 @@ function vHome(){
   h+=`</div>`;
 
   // Период
-  h+=`<div class="card period"><div class="row"><div class="lbl">${per.inc.name} · ${per.start.getDate()}${per.start.getMonth()===per.end.getMonth()?"":" "+MS[per.start.getMonth()]}–${per.end.getDate()} ${MS[per.end.getMonth()]}</div><span class="ctag ${free<0?'warm':'ok'}">${free<0?'впритык':'хватает'}</span></div>
-   <div class="flow">
-    <div class="row"><span>Пришло ${fact?'<span class="pill ok">факт</span>':'<span class="pill">план</span>'}</span><b class="num pos edit" onclick="openIncome('${per.inc.id}','${perKey}')">+${fmt(got)} ₽</b></div>
-    <div class="row"><span>Кредиты <span class="muted small">(${fmt(paid)} оплачено)</span></span><b class="num">−${fmt(due)} ₽</b></div>
-    <div class="row"><span>На жизнь <span class="muted small">(½ месяца)</span></span><b class="num">−${fmt(liveHalf)} ₽</b></div>
-    <div class="sep"></div>
-    <div class="row"><b>Свободно</b><b class="num mid ${free<0?'neg':''}">${fmt(free)} ₽</b></div></div>
-   <div class="small muted" style="margin-top:8px">На жизнь до ${per.end.getDate()} ${MS[per.end.getMonth()]}: ~${rub(liveHalf/Math.max(1,dayDiff(per.start,per.end)+1))} в день, бюджет на жизнь ${rub(budget())}/мес.</div>
-   </div>`;
+  h+=periodCard(per,perKey);
 
   h+=homeCalm(defs);
   for(const w of wishes){ const left=Math.max(0,(w.until-Date.now())/36e5);
@@ -726,17 +775,14 @@ function homeCalm(defs){
   let h='';
   // статус перенесён в бейдж 💡 в шапке
 
-  const ms=Object.entries(sim.closed).map(([id,k])=>({d:S.debts.find(x=>x.id===id),k})).filter(x=>x.d&&x.d.kind!=='mortgage').sort((a,b)=>a.k<b.k?-1:1);
-  h+=`<div class="shead"><h2>Дорожная карта</h2><button class="link" onclick="go('plan')">План</button></div><div class="card">
-   <div class="seg" style="margin-bottom:12px">${Object.entries(MODES).map(([k,[n]])=>`<button class="${S.plan.mode===k?'on':''}" onclick="setPlan('mode','${k}')">${n}</button>`).join('')}</div>
-   ${spark(sim,roadSel)}`;
-  for(const m of ms.slice(0,6)) h+=`<div class="item tap rsel ${roadSel===m.d.id?'on':''}" style="padding:9px 22px 9px 0" onclick="setRoad('${m.d.id}')"><div class="ico" style="background:${m.d.color};width:30px;height:30px;font-size:12px;border-radius:10px">${esc(m.d.name[0])}</div><div class="t"><b>${esc(m.d.name)}</b></div><b>${cap(mLabel(m.k))}</b></div>`;
-  const nxt=sim.rows.find(r=>r.prepaid>0);
-  if(nxt){ const tgt=Object.entries(nxt.pre).map(([id,a])=>`${rub(a)} в ${esc(S.debts.find(d=>d.id===id).name)}`).join(', ');
-    h+=`<div class="step"><div class="n">🌱</div><div class="small"><b>Первый шаг досрочки — в ${MONTHS_P[mi(nxt.key)]}</b><div style="margin-top:3px">${tgt}, после аванса.</div></div></div>`;}
-  h+=`</div>`;
-  h+=`<div class="card"><div class="row"><div><div class="lbl">Долг без ипотеки</div><div class="mid num">${fmt(total)} ₽</div></div><div style="text-align:right"><div class="lbl">без новых долгов</div><div class="mid">${days} ${plural(days,'день','дня','дней')}</div></div></div>
-   <div class="bar" style="margin:12px 0 6px"><i style="width:${Math.max(1,progress*100).toFixed(1)}%"></i></div><div class="small muted">Закрыто ${(progress*100).toFixed(1)}% · дорогие кредиты уйдут к ${sim.costly?MONTHS_D[mi(sim.costly)]+' '+sim.costly.slice(0,4):'—'}</div></div>`;
+  const ya=topDebt(); const nxt=sim.rows.find(r=>r.prepaid>0);
+  h+=`<div class="shead"><h2>Дорожная карта</h2></div><div class="card tapcard" style="cursor:pointer" onclick="go('plan')">
+   <div class="row"><div><div class="lbl">Долг без ипотеки</div><div class="mid num">${fmt(total)} ₽</div></div><span class="link">План →</span></div>
+   <div class="bar" style="margin:12px 0 10px"><i style="width:${Math.max(1,progress*100).toFixed(1)}%"></i></div>
+   <div class="kv"><span class="muted">${ya?esc(ya.name)+' закроешь':'Дорогие кредиты уйдут'}</span><b>${ya&&sim.closed[ya.id]?cap(mLabel(sim.closed[ya.id])):(sim.costly?cap(mLabel(sim.costly)):'—')}</b></div>
+   <div class="kv"><span class="muted">Свобода от долгов</span><b>${sim.freedom?cap(mLabel(sim.freedom)):'—'}</b></div>
+   ${nxt?`<div class="kv"><span class="muted">Следующая досрочка</span><b>${rub(nxt.prepaid)} · ${MS[mi(nxt.key)]}</b></div>`:''}
+   <div class="kv"><span class="muted">Без новых долгов</span><b>${days} ${plural(days,'день','дня','дней')}</b></div></div>`;
   return h;
 }
 let roadSel=null;
@@ -759,14 +805,14 @@ function spark(sim,sel){
   <div class="sbox"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="График снижения долга"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
   ${d0?`<path d="${path(tot)}" fill="none" stroke="rgba(233,247,246,.22)" stroke-width="1.5" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>`:''}
   <path d="${path(focus)} L ${focus[focus.length-1][0]} ${H-14} L ${P} ${H-14} Z" fill="url(#sg)"/><path d="${path(focus)}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round" vector-effect="non-scaling-stroke" style="filter:drop-shadow(0 0 6px ${col}aa)"/></svg>${mark}</div>
-  <div class="row small muted" style="margin-top:2px;white-space:nowrap"><span>${mShort(rows[0].key)}</span><span>${mShort(rows[rows.length-1].key)}</span></div><div class="small muted" style="margin-top:6px;font-size:12px">${d0?'Пунктир — все долги. Нажми на долг ещё раз, чтобы вернуться к общему графику.':'Нажми на долг в списке — покажу его на графике.'}</div></div>`;
+  <div class="row small muted" style="margin-top:2px;white-space:nowrap"><span>${mShort(rows[0].key)}</span><span>${mShort(rows[rows.length-1].key)}</span></div><div class="small muted" style="margin-top:6px;font-size:12px">${d0?'Пунктир — все долги. Нажми на долг ещё раз, чтобы вернуться к общему графику.':'Нажми на долг ниже — покажу его на графике.'}</div></div>`;
 }
 function isLight(hex){const m=hex.replace('#','').match(/../g);if(!m)return false;const [r,g,b]=m.map(x=>parseInt(x,16));return 0.299*r+0.587*g+0.114*b>110}
 function statusCard(defs){let h='';
   if(defs.length) h+=`<div class="card frost"><b>${defs.map(r=>cap(MONTHS_N[mi(r.key)])).join(' и ')} — впритык</b><div class="small" style="margin-top:4px">Это решаемо: можно мягко сдвинуть гибкие личные платежи${shiftNames()?' ('+esc(shiftNames())+')':''}, и в каждом месяце останется запас ${rub(S.plan.buffer)}.</div><button class="btn block cta" style="margin-top:14px" onclick="openBalance()">Сделать спокойнее</button></div>`;
   else h+=`<div class="card frost ok"><b>Всё помещается ✓</b><div class="small" style="margin-top:4px">Ближайшие 6 месяцев каждый платёж покрыт, и остаётся запас ${rub(S.plan.buffer)}.</div></div>`;
   return h;}
-function openStatus(){const defs=deficits(6);sheet(`<h2>Подсказки</h2>`+statusCard(defs)+planTips().map(([i,t,d])=>`<div class="card" style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:22px">${i}</div><div><b>${t}</b><div class="small muted" style="margin-top:4px;line-height:1.45">${d}</div></div></div>`).join('')+`<button class="btn ghost block" onclick="closeSheet()">Закрыть</button>`)}
+function openStatus(){const defs=deficits(6);sheet(`<h2>Подсказки</h2>`+statusCard(defs)+planTips().map(([i,t,d])=>`<div class="card" style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:22px">${i}</div><div><b>${t}</b><div class="small muted" style="margin-top:4px;line-height:1.45">${d}</div></div></div>`).join(''))}
 function homeStrategy(){
   const target=S.debts.filter(d=>d.kind!=='mortgage'&&d.kind!=='personal'&&!d.noPrepay&&d.balance>0).sort((a,b)=>b.apr-a.apr)[0];
   const sims={}; for(const m of Object.keys(MODES)) sims[m]=simulate({mode:m});
@@ -793,7 +839,13 @@ const fmtApr=a=>String(+(+a).toFixed(2)).replace('.',',')+'%';
 function setPlan(k,v){S.plan[k]=v;save();render()}
 
 /* ================== Листы ================== */
-function sheet(html){document.getElementById('sheet').innerHTML='<div class="grab"></div>'+html;document.getElementById('sheetbg').classList.add('open')}
+function sheet(html){const sh=document.getElementById('sheet');sh.style.transform='';
+  const noClose=typeof S!=='undefined'&&S.fresh;
+  sh.innerHTML='<div class="grab"></div>'+(noClose?'':'<button class="sheetx" onclick="closeSheet()" aria-label="Закрыть">✕</button>')+html;document.getElementById('sheetbg').classList.add('open')}
+(function(){const sh=document.getElementById('sheet');let y0=null,dy=0;
+  sh.addEventListener('touchstart',e=>{if(sh.scrollTop>0||(typeof S!=='undefined'&&S.fresh))return;y0=e.touches[0].clientY;dy=0},{passive:true});
+  sh.addEventListener('touchmove',e=>{if(y0==null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform=`translateY(${dy}px)`},{passive:true});
+  sh.addEventListener('touchend',()=>{if(y0==null)return;if(dy>90)closeSheet();sh.style.transform='';y0=null});})();
 function closeSheet(){document.getElementById('sheetbg').classList.remove('open')}
 document.getElementById('sheetbg').addEventListener('click',e=>{if(e.target.id==='sheetbg')closeSheet()});
 const num=v=>+String(v).replace(/\s/g,'').replace(',','.')||0;
@@ -829,7 +881,6 @@ function openBalance(){
   } else h+=`<div class="card alert" style="border-left-color:var(--ok)"><b>После переноса дыр нет ✓</b><div class="small muted">Каждый месяц на 12 вперёд остаётся минимум подушка ${rub(S.plan.buffer)}.</div></div>`;
   h+=`<div class="small muted" style="margin:8px 0">Стоит заранее сказать о новом графике — обычно близкие легко идут навстречу, когда видят чёткий план.</div>`;
   if(p.changes.length) h+=`<button class="btn block cta" onclick="applyBalance()">Применить новый график</button>`;
-  h+=`<button class="btn ghost block" onclick="closeSheet()">Не сейчас</button>`;
   sheet(h);
 }
 function applyBalance(){for(const c of window._bal.changes){S.debts.find(d=>d.id===c.debt.id).schedule=c.schedule.map(s=>({...s}))}save();closeSheet();render();toast('График обновлён')}
@@ -853,7 +904,8 @@ function vPay(){
       if(!occ.length) h+=`<div class="small muted" style="padding:10px 0">Платежей нет</div>`;
       for(const o of occ){ const pd=isPaid(o.key); const late=!pd&&o.date<t;
         h+=`<div class="item ${pd?'done':''}"><button class="chk ${pd?'on':''}" onclick="togglePaidKey('${o.key}')" aria-label="оплачено"></button><div class="t" onclick="openPay('${o.key}')" style="cursor:pointer"><b>${esc(o.debt.name)}</b><span>${o.date.getDate()} ${MONTHS[o.date.getMonth()]}${late?' · <span class="neg">просрочено</span>':''}</span></div><b class="num">${fmt(o.amount)}</b></div>`;}
-      h+=`<div class="sep"></div><div class="row small"><span class="muted">Остаток после кредитов</span><b class="num">${fmt(got-sum)} ₽</b></div></div>`;
+      const paidSum=occ.filter(o=>isPaid(o.key)).reduce((a,o)=>a+o.amount,0);
+      h+=`<div class="sep"></div><div class="row"><span class="muted small">Остаток после оплат${fact?'':' <span class="pill">план</span>'}</span><b class="num" style="font-size:18px">${fmt(got-paidSum)} ₽</b></div></div>`;
     }
     const pers=personalForMonth(key);
     if(pers.length){ h+=`<div class="card"><div class="row"><b>Личные долги</b><span class="pill">откуда получится</span></div>`;
@@ -917,24 +969,25 @@ function saveDebt(id,isNew){
 function vPlan(){
   const sim=planSim(), base=simulate({mode:'calm'});
   let h=header('План',`<button class="gbtn icon" onclick="openTips()" aria-label="Подсказки">💡<span class="bdg">${planTips().length}</span></button>`)+`<div class="sub">Доход ${rub(incomeMonthly())}/мес · бюджет на жизнь ${rub(livingMonthly())}/мес</div>`;
+  const gain=sim.freedom&&base.freedom?monthsBetween(sim.freedom,base.freedom):0; const econ=Math.max(0,base.interest-sim.interest);
+  h+=`<div class="card hero-res"><div class="lbl">Свобода от долгов</div><div class="hero-big">${sim.freedom?cap(mLabel(sim.freedom)):'—'}</div>
+   ${gain>0?`<div class="hero-gain">на ${gain} ${plural(gain,'месяц','месяца','месяцев')} раньше, чем без досрочки</div>`:'<div class="hero-gain muted">по графику, без досрочки</div>'}
+   <div class="hero-row"><div><b class="pos">${rub(econ)}</b><span>экономия на %</span></div><div><b>${sim.costly?mShort(sim.costly):'—'}</b><span>уйдут кредиты 20%+</span></div><div><b>${pdn(true).pct.toFixed(0)}%</b><span>дохода на кредиты</span></div></div></div>
+  <h2>Настройки плана</h2>`;
   h+=`<div class="card"><div class="lbl">Темп</div><div class="modes">${Object.entries(MODES).map(([k,[n,d]])=>`<button class="mode ${S.plan.mode===k?'on':''}" onclick="setPlan('mode','${k}')"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
    <div class="lbl" style="margin-top:6px">Порядок</div><div class="seg" style="margin:8px 0 10px"><button class="${S.plan.strategy==='avalanche'?'on':''}" onclick="setPlan('strategy','avalanche')">Лавина</button><button class="${S.plan.strategy==='snowball'?'on':''}" onclick="setPlan('strategy','snowball')">Снежный ком</button></div>
    <div class="small muted">${S.plan.strategy==='avalanche'?'Сначала самый дорогой по ставке — меньше переплата. '+(topDebt()?' Первым идёт '+esc(topDebt().name)+'.':''):'Сначала самый маленький — быстрее первые победы.'}${noPrepayNames()?' '+esc(noPrepayNames())+' — только по графику.':''}</div>
    <div class="sep"></div><div class="row"><span>Подушка — не трогаем никогда</span><b class="num" id="bv">${rub(S.plan.buffer)}</b></div>
    <input type="range" min="0" max="50000" step="1000" value="${S.plan.buffer}" style="--p:${S.plan.buffer/500}%" oninput="bv.textContent=rub(+this.value);this.style.setProperty('--p',this.value/500+'%')" onchange="setPlan('buffer',+this.value)">
-   <div class="res"><div class="lbl">Что даёт такой план</div><div class="tiles">
-    <div class="tile"><span>Свобода от долгов</span><b>${sim.freedom?cap(mLabel(sim.freedom)):'—'}</b><i>без досрочки — ${base.freedom?mShort(base.freedom):'—'}</i></div>
-    <div class="tile"><span>Экономия на %</span><b class="pos">${rub(Math.max(0,base.interest-sim.interest))}</b><i>переплата ${rub(sim.interest)}</i></div>
-    <div class="tile"><span>Дорогие кредиты 20%+</span><b>${sim.costly?cap(mLabel(sim.costly)):'—'}</b><i>уйдут полностью</i></div>
-    <div class="tile"><span>Доля дохода на кредиты</span><b>${pdn(true).pct.toFixed(0)}%</b><i>сейчас ${pdn(false).pct.toFixed(0)}%, будет снижаться</i></div>
-   </div></div></div>`;
+   </div>`;
   const pA=pdn(true),pN=pdn(false); const intM=S.debts.filter(d=>d.kind!=='mortgage').reduce((s,d)=>s+interestMonthly(d),0);
   h+=`<h2>Порядок закрытия</h2>`;
   for(const d of S.debts.filter(x=>x.prepayMode==='payment'&&x.balance>0)){ const pts=[],vals=[]; let last=null; for(const r of sim.rows){ const v=r.pay[d.id]; if(v==null) continue; if(last==null||Math.abs(v-last)>=100){pts.push(`${mShort(r.key)} <b>${fmt(v)}</b>`);vals.push([r.key,v]);last=v} if(sim.closed[d.id]&&r.key>=sim.closed[d.id]) break; }
-    if(pts.length>1) {const fr=vals[0], lo=vals.length>2?vals[vals.length-2]:vals[vals.length-1]; h+=`<div class="note-y"><div class="ni">i</div><div><b>Платёж ${esc(d.name)} будет уменьшаться</b><div class="ystep"><div><span>сейчас</span><b>${fmt(fr[1])} ₽</b></div><div class="yarr">→</div><div><span>${mShort(lo[0])}</span><b>${fmt(lo[1])} ₽</b></div><div class="yarr">→</div><div><span>${sim.closed[d.id]?mShort(sim.closed[d.id]):'—'}</span><b>закрыт</b></div></div><div class="small muted" style="margin-top:8px;line-height:1.45">Каждая досрочка уменьшает ежемесячный платёж. Цифры пересчитываются, когда меняешь темп или подушку.</div></div></div>`;} }
+    if(pts.length>1) {const fr=vals[0], lo=vals.length>2?vals[vals.length-2]:vals[vals.length-1]; h+=`<div class="note-y"><div class="ni">i</div><div style="flex:1"><b>Досрочка в ${esc(d.name)} уменьшает платёж</b><div class="small" style="margin-top:6px;line-height:1.45">С каждым взносом обязательный платёж ниже: <b class="num">${fmt(fr[1])}</b> → <b class="num">${fmt(lo[1])} ₽</b> к ${MONTHS_D[mi(lo[0])]}. Освободившиеся деньги план сам направит дальше.</div><a class="btn sec" href="https://bank.yandex.ru/pay/split" target="_blank" rel="noopener" style="display:inline-flex;margin-top:12px;padding:10px 16px;font-size:14px;text-decoration:none">Открыть Яндекс Пэй ↗</a><div class="small muted" style="margin-top:8px">Сплит → Условия и документы → Оплатить досрочно. Потом <a href="#" onclick="openDebt('${d.id}');return false" style="color:inherit;text-decoration:underline">отметь взнос здесь</a>, чтобы план пересчитался.</div></div></div>`;} }
+  h+=`<div class="card">${spark(sim,roadSel)}</div>`;
   h+=`<div class="card" style="padding:6px 20px">`;
   const ord=S.debts.filter(d=>d.kind!=='mortgage'&&d.balance>0).sort((a,b)=>(sim.closed[a.id]||'9')>(sim.closed[b.id]||'9')?1:-1);
-  ord.forEach((d,i)=>{ h+=`<div class="item"><div class="ico" style="background:${d.color}">${i+1}</div><div class="t"><b>${esc(d.name)}</b><span>${d.apr?fmtApr(d.apr):'0%'} · ${rub(d.balance)}${d.noPrepay?' · по графику':''}</span></div><div style="text-align:right"><b>${sim.closed[d.id]?mShort(sim.closed[d.id]):'—'}</b><div class="small muted">${S.plan.mode!=='calm'&&base.closed[d.id]&&base.closed[d.id]!==sim.closed[d.id]?'было '+mShort(base.closed[d.id]):''}</div></div></div>`;});
+  ord.forEach((d,i)=>{ h+=`<div class="item tap rsel ${roadSel===d.id?'on':''}" onclick="setRoad('${d.id}')"><div class="ico" style="background:${d.color}">${i+1}</div><div class="t"><b>${esc(d.name)}</b><span>${d.apr?fmtApr(d.apr):'0%'} · ${rub(d.balance)}${d.noPrepay?' · по графику':''}</span></div><div style="text-align:right"><b>${sim.closed[d.id]?mShort(sim.closed[d.id]):'—'}</b><div class="small muted">${S.plan.mode!=='calm'&&base.closed[d.id]&&base.closed[d.id]!==sim.closed[d.id]?'было '+mShort(base.closed[d.id]):''}</div></div></div>`;});
   h+=`</div>`;
   const SEGC={cr:'#2C8C9C',pe:'#8A6FD1',li:'rgba(233,247,246,.28)',pr:'#6FE6EA',fr:'rgba(107,227,201,.0)'};
   h+=`<h2 id="months">Куда уходит зарплата</h2><div class="small muted" style="margin:-4px 0 10px">Каждая полоска — доход месяца. Видно, хватает ли денег и сколько идёт в досрочку.</div>
@@ -953,7 +1006,7 @@ function openMonth(ix){const r=planSim().rows[ix]; const name=cap(MONTHS_N[mi(r.
   const line=(n,v,c)=>`<div class="kv"><span>${c?`<i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c};margin-right:8px"></i>`:''}${n}</span><b class="num">${v}</b></div>`;
   sheet(`<h2>${name}</h2><div class="card">${line('Доход','+'+rub(r.inc))}<div class="sep"></div>${line('Кредиты и ипотека','−'+rub(r.mandatory),'#2C8C9C')}${line('Личные долги','−'+rub(r.personal),'#8A6FD1')}${line('Жизнь','−'+rub(r.live),'rgba(233,247,246,.28)')}${line('Досрочно','−'+rub(r.prepaid),'#6FE6EA')}<div class="sep"></div>${line('<b>Остаётся</b>','<span class="'+(r.free<0?'neg':'')+'">'+rub(r.free)+'</span>')}</div>
   ${r.prepaid?`<div class="small muted" style="margin:4px 2px">Досрочка: ${Object.entries(r.pre).map(([id,a])=>esc(S.debts.find(d=>d.id===id).name)+' — '+rub(a)).join(', ')}</div>`:''}
-  <button class="btn ghost block" onclick="closeSheet()">Закрыть</button>`)}
+  `)}
 function planTips(){
   const ya=topDebt(); const tips=[];
   if(ya) tips.push(['🎯',ya.name+' — первый в очереди',`Из ${rub(ya.payment)} платежа ~${rub(interestMonthly(ya))} сейчас уходит в проценты. Каждая досрочка уменьшает и остаток, и платёж — нагрузка снижается постепенно.`]);
@@ -962,26 +1015,28 @@ function planTips(){
   if(noPrepayNames()) tips.push(['🏠',noPrepayNames()+' — только по графику','Ставки низкие — досрочно гасить их невыгодно, пока есть долги дороже.']);
   return tips;
 }
-function openTips(){sheet(`<h2>Подсказки</h2>`+planTips().map(([i,t,d])=>`<div class="card" style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:22px">${i}</div><div><b>${t}</b><div class="small muted" style="margin-top:4px;line-height:1.45">${d}</div></div></div>`).join('')+`<button class="btn block" onclick="closeSheet()">Понятно</button>`)}
+function openTips(){sheet(`<h2>Подсказки</h2>`+planTips().map(([i,t,d])=>`<div class="card" style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:22px">${i}</div><div><b>${t}</b><div class="small muted" style="margin-top:4px;line-height:1.45">${d}</div></div></div>`).join(''))}
 
 /* ================== Деньги ================== */
 function vMe(){
   const t=today();
-  let h=header('Профиль')+`<div class="card" style="padding:6px 20px;margin-top:14px"><div class="item tap" onclick="openName()"><div class="ico" style="background:linear-gradient(135deg,#1F7A87,#2C97A1);border-radius:50%">${esc((S.name||'?')[0])}</div><div class="t"><b>${esc(S.name||'Как тебя зовут?')}</b><span>имя для приветствия</span></div></div></div><div class="sub" style="margin-top:14px">Доход и бюджет на жизнь — из них считается «свободно» и план погашения</div><h2>Доход</h2><div class="card" style="padding:6px 20px">`;
+  let h=``+header('Профиль')+`<div class="card" style="padding:6px 20px;margin-top:14px"><div class="item tap" onclick="openName()"><div class="ico" style="background:linear-gradient(135deg,#1F7A87,#2C97A1);border-radius:50%">${esc((S.name||'?')[0])}</div><div class="t"><b>${esc(S.name||'Как тебя зовут?')}</b><span>имя для приветствия</span></div></div></div><div class="sub" style="margin-top:14px">Доход и бюджет на жизнь — из них считается «свободно» и план погашения</div><h2>Доход</h2><div class="card" style="padding:6px 20px">`;
   S.income.forEach((i,ix)=>{const key=ym(t); const fact=S.actual[incKey(i,key)];
-    h+=`<div class="item"><div class="t"><b>${esc(i.name)} · ${i.day}-го</b><span>план ${rub(i.amount)}${fact!=null?' · в '+MONTHS_P[t.getMonth()]+' пришло '+rub(fact):''}</span></div><button class="btn sec" onclick="openIncome('${i.id}','${key}')">Факт</button></div>`});
-  h+=`<div class="item"><div class="t"><b>Плановая сумма</b><span>меняет прогноз на будущее</span></div><button class="btn sec" onclick="openIncomePlan()">Изменить</button></div></div>`;
-  h+=`<h2>Бюджет на жизнь</h2>${budgetCard()}<h2 class="row"><span>Траты по категориям</span><button class="gbtn" onclick="openSpend()">＋ Расход</button></h2><div class="small" style="margin:-4px 0 6px">В ${MONTHS_P[t.getMonth()]} потрачено <b>${fmt((S.spend||[]).filter(x=>x.date.slice(0,7)===ym(t)).reduce((s,x)=>s+x.amount,0))} ₽</b></div><div class="small muted" style="margin:-4px 0 8px;line-height:1.45">Без лимитов — просто записывай траты.</div><div class="card" style="padding:6px 20px">`;
-  const mk=ym(t);
-  S.expenses.forEach((e,ix)=>{const paused=!expActive(e,ym(t)); const sp=spentFor(e.id,mk); const n=(S.spend||[]).filter(x=>x.exp===e.id&&x.date.slice(0,7)===mk).length;
-    const sub=[n?n+' '+plural(n,'запись','записи','записей'):'пока нет записей'];
-    h+=`<div class="item tap" onclick="openExpense(${ix})"><div class="t"><b>${esc(e.name)}</b><span>${sub.join(' · ')}</span></div><b class="num ${sp?'':'muted'}" style="${sp?'':'color:var(--muted);font-weight:500'}">${fmt(sp)} ₽</b></div>`});
-  h+=`<button class="btn ghost addcat" onclick="addExpense()">+ Добавить категорию</button></div>`;
-  h+=`<h2>Данные</h2><div class="card small"><p style="margin-top:0">Всё хранится только на этом устройстве. Сохрани копию, чтобы не потерять.</p><p class="muted" style="margin-top:-4px">Сейчас: ${dataSummary()}</p>
+    h+=`<div class="item incrow"><div class="t"><b>${esc(i.name)} · ${i.day}-го</b><span>план <span class="edit" style="color:var(--text);cursor:pointer" onclick="openIncomePlan()">${fmt(i.amount)} ₽</span></span></div><label class="factf"><span>факт в ${MONTHS_P[t.getMonth()]}</span><input inputmode="numeric" placeholder="${fmt(i.amount)}" value="${fact!=null?fmt(fact):''}" onfocus="this.select()" onchange="const v=this.value.trim();if(v===''){delete S.actual['${incKey(i,key)}']}else{S.actual['${incKey(i,key)}']=num(v)};save();render();toast('Сохранено')"></label></div>`});
+  h+=`</div>`;
+  h+=`<h2>Бюджет на жизнь</h2><div class="card" style="padding:6px 20px"><div class="item incrow"><div class="t"><b>В месяц</b><span>всё, кроме долгов</span></div><label class="factf"><span>₽ / мес</span><input inputmode="numeric" value="${fmt(budget())}" onfocus="this.select()" onchange="S.livingBudget=num(this.value);save();render();toast('Бюджет обновлён, план пересчитан')"></label></div></div>`;
+  h+=`<h2>Настройки</h2><div class="card small"><p style="margin-top:0">Всё хранится только на этом устройстве. Сохрани копию, чтобы не потерять.</p><p class="muted" style="margin-top:-4px">Сейчас: ${dataSummary()}</p>
    <div class="row" style="gap:8px"><button class="btn sec block" onclick="copyBackup()">Сохранить копию</button><button class="btn sec block" onclick="openRestore()">Восстановить</button></div>
    <button class="btn sec block" style="margin-top:12px" onclick="icsExport()">📅 Напоминания о платежах в Календарь</button><button class="btn ghost" style="color:var(--danger)" onclick="openReset()">Стереть все данные</button></div>`;
   return h;
 }
+let openCat=null;
+function toggleCat(id){openCat=openCat===id?null:id;render()}
+function catDetail(e,ix,ps,pe){const mk=ym(today()); const recs=(S.spend||[]).filter(x=>x.exp===e.id&&(ps?(x.date>=ps&&x.date<=pe):x.date.slice(0,7)===mk)).sort((a,b)=>a.date<b.date?1:-1); const av=avgActual(e);
+  return `<div class="accbody">${recs.length?recs.map(r=>`<div class="item" style="padding:9px 0"><div class="t"><b class="num">${fmt(r.amount)} ₽</b><span>${parseD(r.date).getDate()} ${MONTHS[parseD(r.date).getMonth()]}${r.note?' · '+esc(r.note):''}</span></div><button class="btn ghost" style="color:var(--muted);padding:6px 4px" onclick="event.stopPropagation();S.spend=S.spend.filter(x=>x.id!=='${r.id}');save();render()" aria-label="удалить">✕</button></div>`).join(''):'<div class="small muted" style="padding:6px 0">Пока нет записей за период</div>'}
+   ${av!=null?`<div class="small muted" style="margin-top:6px">В среднем за прошлые месяцы: <b style="color:var(--text)">${rub(av)}</b></div>`:''}
+   <button class="btn block" style="margin-top:12px" onclick="openSpend('${e.id}')">Добавить расход</button>
+   <button class="btn ghost block" style="color:var(--danger);font-size:14px" onclick="if(this.dataset.c){S.expenses.splice(${ix},1);openCat=null;save();render()}else{this.dataset.c=1;this.textContent='Удалить категорию и её записи?'}">Удалить категорию</button></div>`}
 function openName(){sheet(`<h2>Имя</h2><label class="f"><span>Как к тебе обращаться</span><input id="nm" value="${esc(S.name||'')}"></label><button class="btn block" onclick="S.name=nm.value.trim();save();closeSheet();render()">Сохранить</button>`)}
 function openIncomePlan(){sheet(`<h2>Плановый доход</h2>${S.income.map((i,ix)=>`<label class="f"><span>${i.name}, ${i.day}-го</span><input id="ip${ix}" inputmode="numeric" value="${i.amount}"></label>`).join('')}<button class="btn block" onclick="S.income.forEach((i,ix)=>i.amount=num(document.getElementById('ip'+ix).value));save();closeSheet();render()">Сохранить</button>`)}
 function addExpense(){S.expenses.push({id:'e'+Date.now(),name:'',amount:0,every:1,fresh:true});save();render();openExpense(S.expenses.length-1)}
@@ -995,8 +1050,12 @@ function openSpend(eid){
   setTimeout(()=>{const i=document.getElementById('spa');i&&i.focus()},300);
 }
 function addSpend(){const a=num(spa.value); if(!a||!spendCat){toast('Укажи сумму');return}
+  const per=periodOf(today()); const before=spendPace(per);
   (S.spend=S.spend||[]).push({id:'s'+Date.now(),exp:spendCat,amount:a,date:spd.value||ymd(today()),note:spn.value.trim()});save();closeSheet();render();
-  const e=S.expenses.find(x=>x.id===spendCat); const sp=spentFor(e.id,ym(today())); toast(`${e.name.split(' (')[0]}: ${fmt(sp)} ₽ в ${MONTHS_P[today().getMonth()]}`)}
+  const e=S.expenses.find(x=>x.id===spendCat); const sp=spentFor(e.id,ym(today())); const now=spendPace(per);
+  if(now.over&&!before.over){document.getElementById('toast').classList.remove('on');sheet(`<h2>Вышли за бюджет периода</h2><div class="small muted" style="line-height:1.5">Потрачено ${rub(now.spent)} из ${rub(now.bud)} до ${now.end}. ${willLeftNow()>=0?'Ничего страшного — план уже пересчитался: перерасход возьмём из денег на досрочку, а не в долг.':'К '+now.end+' не хватит '+rub(-willLeftNow())+'. Можно перенести гибкий личный платёж — подскажу в «Подсказках».'}</div><div class="note-y" style="margin-top:16px"><div class="ni">i</div><div style="flex:1;line-height:1.45">До ${now.end} — только самое нужное. Кредитки не трогаем.</div></div><button class="btn block" style="margin-top:8px" onclick="closeSheet()">Понятно</button>`);return}
+  if(now.fast&&!before.fast){toast(`Траты идут быстрее плана · ~${rub(now.perDay)} в день до ${now.end}`);return}
+  toast(`${pick(PRAISE.spend)} · ${e.name.split(' (')[0]}: ${fmt(sp)} ₽`)}
 function delSpend(id,ix){S.spend=S.spend.filter(x=>x.id!==id);save();render();openExpense(ix)}
 function avgActual(e){const keys=[...new Set((S.spend||[]).filter(x=>x.exp===e.id).map(x=>x.date.slice(0,7)))].filter(k=>k<ym(today()));if(!keys.length)return null;return keys.reduce((s,k)=>s+spentFor(e.id,k),0)/keys.length}
 function cutEffect(e){
@@ -1018,6 +1077,51 @@ function monthSummary(){const r=planSim().rows[0]; if(!r) return ''; const t=tod
    <div class="row"><span class="small muted">доход ${fmt(r.inc)} → долги ${fmt(debts)} → жизнь ${fmt(r.live)}${r.prepaid?' → досрочно '+fmt(r.prepaid):''}</span></div>
    <div class="mbar ${r.free<0?'over':''}" style="margin-top:12px"><i style="width:${(r.mandatory/scale*100).toFixed(1)}%;background:#2C8C9C"></i><i style="width:${(r.personal/scale*100).toFixed(1)}%;background:#8A6FD1"></i><i style="width:${(r.live/scale*100).toFixed(1)}%;background:rgba(233,247,246,.28)"></i><i style="width:${(r.prepaid/scale*100).toFixed(1)}%;background:#6FE6EA"></i></div>
    <div class="row" style="margin-top:12px">${st}<span class="link">По месяцам →</span></div></div>`}
+let allCats=false;
+function spendPace(per){const t=today(); const ps=ymd(per.start), pe=ymd(per.end);
+  const spent=(S.spend||[]).filter(x=>x.date>=ps&&x.date<=pe).reduce((s,x)=>s+x.amount,0); const bud=budget()/2;
+  const total=dayDiff(per.start,per.end)+1, passed=Math.min(total,Math.max(1,dayDiff(per.start,t)+1)), days=Math.max(1,total-passed+1);
+  const expect=bud*passed/total; const over=spent>bud; const fast=!over&&spent>expect+bud*0.1&&spent>bud*0.4;
+  return {spent,bud,over,fast,days,pctB:Math.round(spent/bud*100),pctT:Math.round(passed/total*100),perDay:Math.max(0,(bud-spent)/days),end:`${per.end.getDate()} ${MS[per.end.getMonth()]}`};}
+function willLeftNow(){const t=today(); const per=periodOf(t); const perKey=ym(new Date(t.getFullYear(),t.getMonth()+(per.type==='adv'&&t.getDate()<10?-1:0),1));
+  const due=occurrences(per.start,per.end).reduce((s,o)=>s+o.amount,0); const persPaid=personalForMonth(perKey).filter(p=>isPaid(p.key)).reduce((s,p)=>s+p.amount,0);
+  const pc=spendPace(per); return incomeFor(per.inc,perKey)-due-persPaid-Math.max(pc.bud,pc.spent);}
+function paceNote(pc,willLeft){
+  if(pc.over) return `<div class="note-y" style="margin:16px 0 0"><div class="ni">!</div><div style="flex:1"><b>Траты вышли за бюджет на ${rub(pc.spent-pc.bud)}</b><div class="small" style="margin-top:6px;line-height:1.45">${willLeft>=0?`Новых долгов не будет: к ${pc.end} всё равно останется ${rub(willLeft)}. Просто досрочки в этом месяце будет меньше — план уже пересчитался.`:`К ${pc.end} не хватит ${rub(-willLeft)}. До конца периода лучше только самое нужное — и не трогать кредитки.`}</div></div></div>`;
+  if(pc.fast) return `<div class="note-y" style="margin:16px 0 0"><div class="ni">i</div><div style="flex:1"><b>Траты идут быстрее плана</b><div class="small" style="margin-top:6px;line-height:1.45">Потрачено ${pc.pctB}% бюджета, а прошло ${pc.pctT}% периода. Чтобы уложиться — ~${rub(pc.perDay)} в день до ${pc.end}.</div></div></div>`;
+  return '';}
+function periodCard(per,perKey){
+  const t=today(); const occ=occurrences(per.start,per.end); const due=occ.reduce((s,o)=>s+o.amount,0);
+  const paidList=occ.filter(o=>isPaid(o.key)); const paid=paidList.reduce((s,o)=>s+o.amount,0);
+  const pers=personalForMonth(perKey).filter(p=>isPaid(p.key)); const persPaid=pers.reduce((s,p)=>s+p.amount,0);
+  const got=incomeFor(per.inc,perKey); const fact=S.actual[incKey(per.inc,perKey)]!=null;
+  const ps=ymd(per.start), pe=ymd(per.end);
+  const inPer=x=>x.date>=ps&&x.date<=pe;
+  const spendP=(S.spend||[]).filter(inPer); const spent=spendP.reduce((s,x)=>s+x.amount,0);
+  const bud=budget()/2; const days=Math.max(1,dayDiff(t,per.end)+1);
+  const nowLeft=got-paid-persPaid-spent;                        // реально на руках сейчас
+  const willLeft=got-due-persPaid-Math.max(bud,spent);         // к концу периода
+  const pctCr=due?Math.min(100,paid/due*100):100, pctSp=bud?Math.min(100,spent/bud*100):0, overSp=spent>bud;
+  const cats=S.expenses.map((e,ix)=>({e,ix,sum:spendP.filter(x=>x.exp===e.id).reduce((s,x)=>s+x.amount,0),n:spendP.filter(x=>x.exp===e.id).length})).sort((a,b)=>b.sum-a.sum);
+  let h=`<div class="card period"><div class="row"><div class="lbl">${per.inc.name} · ${per.start.getDate()}${per.start.getMonth()===per.end.getMonth()?"":" "+MS[per.start.getMonth()]}–${per.end.getDate()} ${MS[per.end.getMonth()]}</div><span class="ctag ${willLeft<0?'warm':'ok'}">${willLeft<0?'впритык':'хватает'}</span></div>${paceNote(spendPace(per),willLeft)}
+   <div class="row" style="margin-top:14px;align-items:flex-end"><div><div class="small muted">на руках сейчас</div><div class="num mid ${nowLeft<0?'neg':''}">${fmt(nowLeft)} ₽</div></div><div style="text-align:right"><div class="small muted">к ${per.end.getDate()} ${MS[per.end.getMonth()]} останется</div><div class="num" style="font-size:19px;font-weight:700;${willLeft<0?'color:var(--danger)':''}">${fmt(willLeft)} ₽</div></div></div>
+   <div class="flow" style="margin-top:18px">
+    <div class="row"><span>Пришло ${fact?'<span class="pill ok">факт</span>':'<span class="pill">план</span>'}</span><b class="num pos edit" onclick="openIncome('${per.inc.id}','${perKey}')">+${fmt(got)} ₽</b></div>
+    <div><div class="row"><span>Кредиты</span><b class="num">${fmt(paid)} <span class="small muted" style="font-weight:400">из ${fmt(due)} ₽</span></b></div><div class="bar thin"><i style="width:${pctCr.toFixed(1)}%"></i></div></div>
+    ${persPaid?`<div class="row"><span>Личные долги</span><b class="num">${fmt(persPaid)} ₽</b></div>`:''}
+    <div><div class="row"><span>Расходы</span><b class="num">${fmt(spent)} <span class="small muted" style="font-weight:400">из ${fmt(bud)} ₽</span></b></div><div class="bar thin"><i style="width:${pctSp.toFixed(1)}%;${overSp?'background:var(--warn);box-shadow:none':''}"></i></div>
+     ${(()=>{const pc=spendPace(per);return pc.over||pc.fast?'':`<div class="small muted" style="margin-top:6px">можно ~${rub((bud-spent)/days)} в день до ${per.end.getDate()} ${MS[per.end.getMonth()]}</div>`})()}</div>
+   </div>
+   <div class="sep" style="margin:18px 0 6px"></div>
+   <div class="lbl" style="margin:8px 0 2px">Расходы по категориям</div>`;
+  const shown=allCats?cats:cats.filter(c=>c.sum>0||openCat===c.e.id); const hidden=cats.length-shown.length;
+  if(!shown.length) h+=`<div class="small muted" style="padding:8px 0">Пока нет расходов за период</div>`;
+  shown.forEach(({e,ix,sum,n})=>{ const open=openCat===e.id;
+    h+=`<div class="item tap acc-row ${open?'open':''}" onclick="toggleCat('${e.id}')"><div class="t"><b>${esc(e.name)}</b><span>${n?n+' '+plural(n,'запись','записи','записей'):'пока нет записей'}</span></div><b class="num" style="${sum?'':'color:var(--muted);font-weight:500'}">${fmt(sum)} ₽</b></div>${open?catDetail(e,ix,ps,pe):''}`;});
+  if(hidden>0||allCats) h+=`<button class="btn ghost" style="padding:12px 0 2px" onclick="allCats=!allCats;render()">${allCats?'Свернуть пустые':'Все категории · ещё '+hidden}</button>`;
+  h+=`<button class="btn block" style="margin-top:16px" onclick="openSpend()">Добавить расход</button>${allCats?'<button class="btn ghost addcat" onclick="addExpense()">+ Добавить категорию</button>':''}</div>`;
+  return h;
+}
 function budgetCard(){const t=today(); const sp=spentMonth(ym(t)); const b=budget(); const pct=b?Math.min(100,sp/b*100):0; const over=sp>b;
   const daysLeft=dim(t.getFullYear(),t.getMonth())-t.getDate()+1;
   return `<div class="card tapcard" onclick="openBudget()" style="cursor:pointer"><div class="row"><div><div class="lbl">${cap(MONTHS_N[t.getMonth()])}</div><div class="mid num">${fmt(sp)} <span class="small muted">из ${fmt(b)} ₽</span></div></div><span class="pill">изменить</span></div>
@@ -1078,8 +1182,8 @@ function renderStop(){
   </div>`);
 }
 function stopWait(){const s=stopState; if(s.wishId){S.wishes.find(x=>x.id===s.wishId).until=Date.now()+48*36e5;} else S.wishes.push({id:'w'+Date.now(),what:s.what||'Покупка',amount:s.amount,months:s.months,apr:s.apr,until:Date.now()+48*36e5});save();closeSheet();go('home');toast('Напомню на главной через 48 ч')}
-function stopNo(){S.savedByStop+=stopState.amount; if(stopState.wishId) S.wishes=S.wishes.filter(w=>w.id!==stopState.wishId); save();closeSheet();render();toast('Сильно! +'+rub(stopState.amount)+' не в долг')}
-function wishDrop(id){const w=S.wishes.find(x=>x.id===id);S.savedByStop+=w.amount;S.wishes=S.wishes.filter(x=>x.id!==id);save();render();toast('Сильно! 🎉')}
+function stopNo(){S.savedByStop+=stopState.amount; if(stopState.wishId) S.wishes=S.wishes.filter(w=>w.id!==stopState.wishId); save();closeSheet();render();celebrate({emoji:'🛡',title:'Ты устояла!',text:`${rub(stopState.amount)} не превратились в новый долг. Это решение — настоящая забота о себе.`,stat:`Всего отказалась от ${rub(S.savedByStop)} новых долгов`,confetti:true})}
+function wishDrop(id){const w=S.wishes.find(x=>x.id===id);S.savedByStop+=w.amount;S.wishes=S.wishes.filter(x=>x.id!==id);save();render();celebrate({emoji:'🛡',title:'Передумала — и это сила',text:`${rub(w.amount)} остаются твоими, а не банка.`,stat:`Всего отказалась от ${rub(S.savedByStop)} новых долгов`,confetti:true})}
 function stopTake(){const s=stopState;const P=annuity(s.amount,s.apr,s.months);
   S.debts.push({id:'d'+Date.now(),name:s.what||'Новый долг',kind:s.apr>0?'loan':'card',color:'#6B7C93',balance:s.amount,apr:s.apr,payment:Math.round(P),day:15,schedule:[]});
   S.startTotal+=s.amount; S.noDebtSince=ymd(today()); if(s.wishId) S.wishes=S.wishes.filter(w=>w.id!==s.wishId);
@@ -1112,7 +1216,8 @@ function applyPrepay(id){
   if(d.prepayMode==='payment'&&d.apr>0){ const n=Math.ceil(nper(d.balance,d.payment,d.apr)); d.balance-=a; d.payment=d.balance>0?Math.round(annuity(d.balance,d.apr,n)):0; }
   else d.balance-=a;
   S.paid[d.id+'|pre-'+ymd(today())+'-'+Date.now()%1000]={d:a,amt:a,at:ymd(today()),pre:true};
-  save();closeSheet();render();toast(d.prepayMode==='payment'?`Платёж ${fmt(old)} → ${fmt(d.payment)} ₽. Сверь с банком`:'Досрочка учтена');
+  save();closeSheet();render();
+  if(d.balance<=0.5) celebrateClose(d); else { praise('prepay',{d,a,old}); checkMilestone(); }
 }
 
 /* ================== Календарь ================== */
@@ -1183,6 +1288,59 @@ function openCal(){const t=today(); const cur=periodOf(t); let start=new Date(t.
   m.innerHTML=`<div class="fmhead"><h1>Календарь</h1><button class="gbtn icon" onclick="closeCal()" aria-label="Закрыть">✕</button></div><div class="fmbody">${vCalAll(start)}</div>`;
   m.classList.add('open'); document.body.style.overflow='hidden';}
 function closeCal(){const m=document.getElementById('fullcal'); if(m){m.classList.remove('open')} document.body.style.overflow='';}
+
+
+/* ================== Похвала и праздники ================== */
+const PRAISE={
+ pay:['Платёж закрыт. Ты держишь слово перед собой 💪','Ещё один шаг к свободе от долгов ✨','Минус платёж — плюс спокойствие 🌿','Так держать! Каждая оплата — это победа','Ты справляешься, правда. Отмечено ✓'],
+ prepay:['Досрочка! Это прям сильно 🔥','Ты платишь больше, чем обязана, — уважение 💎'],
+ spend:['Записано. Честный учёт — уже половина успеха','Записала — значит контролируешь ✓'],
+};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function praise(type,o={}){
+  if(type==='prepay'&&o.d.prepayMode==='payment'&&o.old!==o.d.payment) return celebrate({emoji:'🔥',title:'Досрочка внесена!',text:`${esc(o.d.name)}: платёж уменьшился с ${rub(o.old)} до ${rub(o.d.payment)}. Сверь сумму в приложении банка.`,stat:`Внесено ${rub(o.a)} сверх графика`,confetti:true});
+  if(type==='prepay') return celebrate({emoji:'🔥',title:'Досрочка внесена!',text:pick(PRAISE.prepay),stat:`${esc(o.d.name)}: −${rub(o.a)} к остатку`,confetti:true});
+  toast(pick(PRAISE[type]||PRAISE.pay));
+}
+function afterPay(d,before,amt){
+  if(before>0.5&&d.balance<=0.5) return celebrateClose(d);
+  const per=periodOf(today()); const occ=occurrences(per.start,per.end);
+  if(occ.length&&occ.every(o=>isPaid(o.key))){ const k='per|'+ymd(per.start); S.celebrated=S.celebrated||{}; if(!S.celebrated[k]){S.celebrated[k]=1;save();
+    return celebrate({emoji:'🏁',title:'Все платежи периода оплачены!',text:'Ни одной просрочки. Можно выдохнуть до следующей зарплаты — ты отлично справляешься.',stat:`${occ.length} ${plural(occ.length,'платёж','платежа','платежей')} · ${rub(occ.reduce((a,o)=>a+o.amount,0))}`,confetti:true});}}
+  if(!checkMilestone()) praise('pay');
+}
+function checkMilestone(){
+  const p=S.startTotal?(S.startTotal-consumerTotal())/S.startTotal*100:0; S.celebrated=S.celebrated||{};
+  for(const m of [5,10,25,50,75,90]) if(p>=m&&!S.celebrated['ms'+m]){S.celebrated['ms'+m]=1;save();
+    celebrate({emoji:m>=50?'🏆':'⭐',title:`Закрыто ${m}% долгов!`,text:m>=50?'Больше половины пути позади. Это огромная работа — гордись собой.':'Это уже заметный путь. Каждый процент — твой труд и выдержка.',stat:`Погашено ${rub(S.startTotal-consumerTotal())}`,confetti:true}); return true;}
+  return false;
+}
+function celebrateClose(d){
+  const left=S.debts.filter(x=>x.kind!=='mortgage'&&x.balance>0.5).length;
+  const saved=d.apr>0?` Больше никаких ${fmtApr(d.apr)} годовых.`:'';
+  celebrate({emoji:'🎉',title:d.kind==='personal'?'Долг закрыт!':`${esc(d.name)} закрыт!`,text:d.kind==='personal'?`${esc(d.name)} — всё отдано. Ты это сделала! Это большая победа — отметь её.`:`Ты это сделала! Минус один долг.${saved} Это большая победа — отметь её.`,stat:left?`Осталось ${left} ${plural(left,'долг','долга','долгов')} без ипотеки`:'Все долги кроме ипотеки закрыты 🥳',confetti:true,big:true});
+  checkMilestone();
+}
+function celebrate({emoji,title,text,stat,confetti,big}){
+  let m=document.getElementById('cele'); if(!m){m=document.createElement('div');m.id='cele';document.body.appendChild(m)}
+  m.className='cele'+(big?' big':'');
+  m.innerHTML=`<div class="celecard"><button class="sheetx" onclick="closeCele()" aria-label="Закрыть">✕</button><div class="celeemoji">${emoji}</div><h2>${title}</h2><div class="celetext">${text}</div>${stat?`<div class="celestat">${stat}</div>`:''}<button class="btn block" onclick="closeCele()">Ура!</button></div>`;
+  requestAnimationFrame(()=>m.classList.add('open'));
+  try{navigator.vibrate&&navigator.vibrate(big?[30,40,60]:25)}catch(e){}
+  if(confetti&&!matchMedia('(prefers-reduced-motion: reduce)').matches) confettiBurst(big?220:120);
+}
+function closeCele(){const m=document.getElementById('cele'); if(m) m.classList.remove('open')}
+function confettiBurst(n){
+  const c=document.createElement('canvas'); c.className='confetti'; document.body.appendChild(c);
+  const W=c.width=innerWidth*devicePixelRatio, H=c.height=innerHeight*devicePixelRatio; const ctx=c.getContext('2d');
+  const cols=['#6FE6EA','#55DCE3','#6BE3C9','#FFD98A','#F4C27F','#FFFFFF','#8FB8FF'];
+  const ps=Array.from({length:n},()=>({x:W/2+(Math.random()-.5)*W*.2,y:H*.42,vx:(Math.random()-.5)*W*.022,vy:-(Math.random()*H*.02+H*.006),r:(Math.random()*6+4)*devicePixelRatio,c:cols[Math.floor(Math.random()*cols.length)],a:Math.random()*6,va:(Math.random()-.5)*.3,s:Math.random()<.5}));
+  const t0=performance.now();
+  (function f(t){const el=t-t0; ctx.clearRect(0,0,W,H);
+    for(const p of ps){p.vy+=H*.00045;p.vx*=.992;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.globalAlpha=Math.max(0,1-el/2800);ctx.fillStyle=p.c;
+      if(p.s)ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);else{ctx.beginPath();ctx.arc(0,0,p.r/2.6,0,7);ctx.fill()}ctx.restore()}
+    if(el<2900)requestAnimationFrame(f);else c.remove()})(t0);
+}
 
 
 /* ===== PWA: онбординг ===== */
