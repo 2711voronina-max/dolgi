@@ -543,6 +543,27 @@ h2{margin:34px 0 12px}
 #catmenu .cm-list button.del{color:#FF7A7A}
 .qbtn.wide{width:auto;border-radius:99px;padding:0 18px 0 20px;gap:6px;display:flex;align-items:center;font:inherit;font-size:16px;font-weight:600}
 .qbtn.wide svg{width:18px;height:18px}
+details.hist{margin-top:28px}
+details.hist summary{list-style:none;cursor:pointer;font-size:20px;font-weight:700;padding:0 4px 12px}
+details.hist summary::-webkit-details-marker{display:none}
+details.hist summary .sub{font-size:15px;font-weight:500}
+details.hist[open] summary .sub{opacity:.6}
+details.hist .item b{opacity:.75}
+.note-g{padding:14px 16px;border-radius:18px;background:rgba(79,227,203,.12);box-shadow:inset 0 0 0 1px rgba(79,227,203,.25)}
+.note-g .btn.ghost{color:var(--muted);display:block}
+.cele.big{padding:0}
+.cele.big .celecard{width:100%;max-width:none;height:100%;border-radius:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:calc(env(safe-area-inset-top) + 60px) 28px calc(env(safe-area-inset-bottom) + 32px);background:radial-gradient(120% 70% at 50% 20%,rgba(79,227,203,.35),transparent 60%),linear-gradient(180deg,#0E3A43,#06141A)}
+.cele.big .celecard h2{font-size:32px;line-height:1.15;margin:6px 0 14px}
+.cele.big .celetext{font-size:17px;max-width:320px}
+.cele.big .celestat{margin-top:22px}
+.cele.big .celecard>.btn{margin-top:auto;max-width:360px}
+.cele.big .sheetx{top:calc(env(safe-area-inset-top) + 16px)}
+.celekick{font-size:14px;letter-spacing:.06em;color:#6FE6EA;font-weight:600;margin-top:10px}
+.swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.swatches .sw{width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.swatches .sw.on{box-shadow:0 0 0 2px #0B1F26,0 0 0 4px #6FE6EA}
+div.f{display:block;margin:10px 0}
+div.f>span{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
 </style>
 </head>
 <body>
@@ -564,6 +585,9 @@ function migrate(){
   S.debts=S.debts||[];S.expenses=S.expenses||[];S.income=S.income||[];S.paid=S.paid||{};S.actual=S.actual||{};S.spend=S.spend||[];S.wishes=S.wishes||[];
   S.plan=Object.assign({strategy:'avalanche',mode:'balanced',buffer:10000},S.plan||{});
   if(S.startTotal==null) S.startTotal=consumerTotal();
+  S.mig=S.mig||{};
+  
+  
   if(S.name===undefined&&SEED.name) S.name=SEED.name;
   if(S.livingBudget==null) S.livingBudget=60000;
   if(!S.mpAdded){ if(!S.expenses.some(e=>/маркетплейс/i.test(e.name))) S.expenses.push({id:'e9',name:'Маркетплейсы',amount:0,every:1}); S.mpAdded=true; }
@@ -636,7 +660,7 @@ function occurrences(from,to){
   for(const d of S.debts){ if(d.kind==='personal') continue;
     let c=new Date(from.getFullYear(),from.getMonth(),1);
     while(c<=to){ const dt=dateIn(c.getFullYear(),c.getMonth(),d.day); const k=d.id+'|'+ymd(dt);
-      if(dt>=from&&dt<=to&&(activeOn(d,dt)||S.paid[k])) out.push({debt:d,date:dt,key:k,amount:S.paid[k]&&S.paid[k].amt?S.paid[k].amt:Math.min(d.payment,d.balance||d.payment)});
+      if(dt>=from&&dt<=to&&!(d.startKey&&ym(dt)<d.startKey)&&(activeOn(d,dt)||S.paid[k])) out.push({debt:d,date:dt,key:k,amount:S.paid[k]&&S.paid[k].amt?S.paid[k].amt:Math.min(d.payment,d.balance||d.payment)});
       c=addM(c,1);} }
   return out.sort((a,b)=>a.date-b.date);
 }
@@ -966,7 +990,7 @@ function vDebts(){
   const groups=[['Кредиты и карты',d=>d.kind==='loan'||d.kind==='card'],['Личные',d=>d.kind==='personal'],['Ипотека',d=>d.kind==='mortgage']];
   const sim=planSim();
   let h=header('Долги',`<button class="gbtn icon" onclick="openDebt()" aria-label="Добавить долг">＋</button>`);
-  for(const [g,f] of groups){ const list=S.debts.filter(f); if(!list.length) continue;
+  for(const [g,f] of groups){ const list=S.debts.filter(d=>f(d)&&d.balance>0.5); if(!list.length) continue;
     const sum=list.reduce((s,d)=>s+Math.max(0,d.balance),0);
     h+=`<h2 class="row"><span>${g}</span><span class="num sub">${fmt(sum)} ₽</span></h2><div class="card" style="padding:6px 20px">`;
     for(const d of list.slice().sort((a,b)=>b.apr-a.apr||b.balance-a.balance)){
@@ -979,19 +1003,37 @@ function vDebts(){
       const close=sim.closed[d.id];
       h+=`<div class="item tap" onclick="openDebt('${d.id}')"><div class="ico" style="background:${d.color||'#888'}">${esc(d.name[0])}</div><div class="t"><b>${esc(d.name)}</b><span>${d.kind==='personal'?'по договорённости':fmt(d.payment)+' ₽ · '+d.day+'-го'}${close?' · закроешь в '+mShort(close):''}</span><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px">${tags.join('')}</div></div><b class="num">${fmt(d.balance)}</b></div>`;}
     h+=`</div>`;}
+  const done=S.debts.filter(d=>d.balance<=0.5).sort((a,b)=>(b.closedAt||'')>(a.closedAt||'')?1:-1);
+  if(done.length){ h+=`<details class="hist"><summary class="row"><span>История</span><span class="sub">${done.length} ${plural(done.length,'закрыт','закрыто','закрыто')} ›</span></summary><div class="card" style="padding:6px 20px">`;
+    for(const d of done){ const dt=d.closedAt?parseD(d.closedAt):null;
+      h+=`<div class="item tap" onclick="openDebt('${d.id}')"><div class="ico" style="background:${d.color||'#888'};opacity:.55">✓</div><div class="t"><b>${esc(d.name)}</b><span>закрыт${dt?' '+dt.getDate()+' '+MS[dt.getMonth()]+' '+dt.getFullYear():''}</span></div>${d.closedSum?`<b class="num muted">${fmt(d.closedSum)}</b>`:''}</div>`; }
+    h+=`</div></details>`; }
   return h;
 }
+function closeEarly(id){ const d=S.debts.find(x=>x.id===id);
+  sheet(`<h2>Закрыть ${d.kind==='personal'?'долг':'досрочно'}</h2><div class="small muted" style="line-height:1.5">${d.kind==='personal'?'Отметь, что всё отдано.':'Возьми точную сумму для полного погашения в приложении банка — она может немного отличаться из-за процентов за дни.'}</div>
+  <div class="grid2" style="margin-top:12px"><label class="f"><span>Сумма, ₽</span><input id="cea" inputmode="decimal" value="${Math.round(d.balance*100)/100}"></label><label class="f"><span>Дата</span><input id="ced" type="date" value="${ymd(today())}"></label></div>
+  <button class="btn block" onclick="doCloseEarly('${id}')">Закрыть ${esc(d.name)}</button>`); }
+function doCloseEarly(id){ const d=S.debts.find(x=>x.id===id); const a=num(cea.value)||d.balance; const dt=ced.value||ymd(today());
+  S.paid[d.id+'|close-'+dt]={d:d.balance,amt:a,at:dt,pre:true,close:true};
+  d.balance=0; d.closedAt=dt; d.closedSum=a; save(); closeSheet(); render(); celebrateClose(d,a); }
+function reopenDebt(id){ const d=S.debts.find(x=>x.id===id); const k=Object.keys(S.paid).find(k=>k.startsWith(d.id+'|close-'));
+  if(k){ d.balance+=S.paid[k].d; delete S.paid[k]; } delete d.closedAt; delete d.closedSum; save(); closeSheet(); render(); toast('Вернула в активные'); }
 function openDebt(id){
   const d=id?S.debts.find(x=>x.id===id):{id:'d'+Date.now(),name:'',kind:'loan',color:'#6B7C93',balance:0,apr:0,payment:0,day:1,schedule:[]};
   const isNew=!id; const pers=d.kind==='personal';
   const hist=Object.entries(S.paid).filter(([k])=>k.startsWith(d.id+'|')).sort().reverse().slice(0,6);
   const info=(!isNew&&!pers&&d.apr>0)?`<div class="card small"><div class="row"><span class="muted">В проценты в месяц</span><b class="num">${rub(interestMonthly(d))}</b></div><div class="row" style="margin-top:6px"><span class="muted">В тело долга</span><b class="num">${rub(Math.max(0,d.payment-interestMonthly(d)))}</b></div></div>`:'';
   const pp=(!isNew&&!pers&&!d.noPrepay&&d.balance>0)?`<div class="card"><div class="lbl">Внести досрочно</div><div class="row" style="gap:8px;margin-top:8px"><input id="ppa" inputmode="numeric" placeholder="Сумма, ₽"><button class="btn" onclick="applyPrepay('${d.id}')">Внести</button></div><div class="small muted" style="margin-top:6px">${d.prepayMode==='payment'?'Остаток уменьшится, платёж пересчитается на тот же срок':'Остаток уменьшится, срок сократится'}</div></div>`:'';
-  sheet(`<h2>${isNew?'Новый долг':esc(d.name)}</h2>${d.note?`<div class="small muted">${esc(d.note)}</div>`:''}${info}${pp}
+  const closedInfo=!isNew&&d.balance<=0.5?`<div class="note-g" style="margin-top:12px"><b>Закрыт${d.closedAt?' '+parseD(d.closedAt).getDate()+' '+MS[parseD(d.closedAt).getMonth()]+' '+parseD(d.closedAt).getFullYear():''} 🎉</b>${d.closedSum?`<div class="small" style="margin-top:4px">Последний взнос ${rub(d.closedSum)}</div>`:''}<button class="btn ghost" style="padding:8px 0;font-size:14px" onclick="reopenDebt('${d.id}')">Вернуть в активные</button></div>`:'';
+  const ce=!isNew&&d.balance>0.5?`<button class="btn sec block" style="margin-top:12px" onclick="closeEarly('${d.id}')">${d.kind==='personal'?'Отдала полностью':'Закрыть досрочно'}</button>`:'';
+  sheet(`<h2>${isNew?'Новый долг':esc(d.name)}</h2>${d.note?`<div class="small muted">${esc(d.note)}</div>`:''}${closedInfo}${info}${pp}${ce}
   <label class="f"><span>Название</span><input id="fn" value="${esc(d.name)}"></label>
+  <div class="f"><span>Цвет</span><div class="swatches"><input type="hidden" id="fc" value="${d.color||'#6B7C93'}">${['#1E3A8A','#2F6FDE','#1F9D55','#E3B505','#E8452C','#C2185B','#9C6ADE','#E76F51','#1F1F23','#6B7C93'].map(c=>`<button type="button" class="sw ${(d.color||'').toUpperCase()===c?'on':''}" style="background:${c}" onclick="fc.value='${c}';this.parentNode.querySelectorAll('.sw').forEach(x=>x.classList.remove('on'));this.classList.add('on')" aria-label="Цвет"></button>`).join('')}</div></div>
   <label class="f"><span>Тип</span><select id="fk">${Object.entries(kindName).map(([k,n])=>`<option value="${k}" ${d.kind===k?'selected':''}>${n}</option>`).join('')}</select></label>
   <div class="grid2"><label class="f"><span>Остаток, ₽</span><input id="fb" inputmode="decimal" value="${Math.round(d.balance*100)/100}"></label><label class="f"><span>Ставка, %</span><input id="fa" inputmode="decimal" value="${d.apr}"></label>
   <label class="f"><span>Платёж, ₽</span><input id="fp" inputmode="decimal" value="${d.payment||0}"></label><label class="f"><span>День платежа</span><input id="fd" inputmode="numeric" value="${d.day||1}"></label></div>
+  ${!pers?`<label class="f"><span>Первый платёж (если ещё не начались)</span><input id="ffp" type="date" value="${d.firstPay||''}"></label>`:''}
   <label class="f"><span>Каникулы до (необязательно)</span><input id="fh" type="date" value="${d.holidayUntil||''}"></label>
   ${!pers?`<label class="f"><span>Досрочное погашение</span><select id="fpm"><option value="term" ${d.prepayMode!=='payment'?'selected':''}>уменьшает срок</option><option value="payment" ${d.prepayMode==='payment'?'selected':''}>уменьшает ежемесячный платёж</option></select></label>`:''}
   <label class="check"><input type="checkbox" id="fnp" ${d.noPrepay?'checked':''}><span>Не гасить досрочно (только по графику)</span></label>
@@ -1003,8 +1045,9 @@ function openDebt(id){
 }
 function saveDebt(id,isNew){
   let d=isNew?{id,color:['#6B7C93','#9C6ADE','#2A9D8F','#E76F51'][S.debts.length%4],schedule:[]}:S.debts.find(x=>x.id===id);
-  Object.assign(d,{name:fn.value||'Без названия',kind:fk.value,balance:num(fb.value),apr:num(fa.value),payment:num(fp.value),day:Math.min(31,Math.max(1,num(fd.value)||1)),holidayUntil:fh.value||undefined,noPrepay:fnp.checked,canShift:fcs.checked});
+  Object.assign(d,{color:fc.value||d.color,name:fn.value||'Без названия',kind:fk.value,balance:num(fb.value),apr:num(fa.value),payment:num(fp.value),day:Math.min(31,Math.max(1,num(fd.value)||1)),holidayUntil:fh.value||undefined,noPrepay:fnp.checked,canShift:fcs.checked});
   const pm=document.getElementById('fpm'); if(pm) d.prepayMode=pm.value;
+  const fp1=document.getElementById('ffp'); if(fp1){ if(fp1.value&&fp1.value>ymd(today())){ d.firstPay=fp1.value; d.startKey=fp1.value.slice(0,7); d.day=parseD(fp1.value).getDate(); } else { delete d.firstPay; delete d.startKey; } }
   const fsEl=document.getElementById('fs');
   if(fsEl) d.schedule=fsEl.value.split('\n').map(l=>l.match(/(\d{4}-\d{2})\s*:\s*([\d\s.,]+)/)).filter(Boolean).map(m=>({m:m[1],a:num(m[2])}));
   if(isNew){S.debts.push(d); if(d.kind!=='mortgage') S.startTotal+=d.balance; S.noDebtSince=ymd(today());}
@@ -1387,21 +1430,21 @@ function checkMilestone(){
     celebrate({emoji:m>=50?'🏆':'⭐',title:`Закрыто ${m}% долгов!`,text:m>=50?'Больше половины пути позади. Это огромная работа — гордись собой.':'Это уже заметный путь. Каждый процент — твой труд и выдержка.',stat:`Погашено ${rub(S.startTotal-consumerTotal())}`,confetti:true}); return true;}
   return false;
 }
-function celebrateClose(d){
+function celebrateClose(d,sum){
   const left=S.debts.filter(x=>x.kind!=='mortgage'&&x.balance>0.5).length;
   const saved=d.apr>0?` Больше никаких ${fmtApr(d.apr)} годовых.`:'';
-  celebrate({emoji:'🎉',title:d.kind==='personal'?'Долг закрыт!':`${esc(d.name)} закрыт!`,text:d.kind==='personal'?`${esc(d.name)} — всё отдано. Ты это сделала! Это большая победа — отметь её.`:`Ты это сделала! Минус один долг.${saved} Это большая победа — отметь её.`,stat:left?`Осталось ${left} ${plural(left,'долг','долга','долгов')} без ипотеки`:'Все долги кроме ипотеки закрыты 🥳',confetti:true,big:true});
-  checkMilestone();
+  celebrate({emoji:'🎉',kicker:'Минус один долг',title:d.kind==='personal'?`${esc(d.name)} — всё отдано!`:`Прощай, ${esc(d.name)}!`,text:d.kind==='personal'?`${esc(d.name)} — всё отдано. Ты это сделала! Это большая победа — отметь её.`:`Кредит закрыт полностью.${saved} Ты это сделала — это большая победа, отметь её.`,stat:(sum?`Внесено ${rub(sum)} · `:'')+(left?`Осталось ${left} ${plural(left,'долг','долга','долгов')} без ипотеки`:'Все долги кроме ипотеки закрыты 🥳'),confetti:true,big:true});
+  window._afterCele=()=>checkMilestone();
 }
-function celebrate({emoji,title,text,stat,confetti,big}){
+function celebrate({emoji,title,text,stat,confetti,big,kicker}){
   let m=document.getElementById('cele'); if(!m){m=document.createElement('div');m.id='cele';document.body.appendChild(m)}
   m.className='cele'+(big?' big':'');
-  m.innerHTML=`<div class="celecard"><button class="sheetx" onclick="closeCele()" aria-label="Закрыть">✕</button><div class="celeemoji">${emoji}</div><h2>${title}</h2><div class="celetext">${text}</div>${stat?`<div class="celestat">${stat}</div>`:''}<button class="btn block" onclick="closeCele()">Ура!</button></div>`;
+  m.innerHTML=`<div class="celecard"><button class="sheetx" onclick="closeCele()" aria-label="Закрыть">✕</button><div class="celeemoji">${emoji}</div>${kicker&&big?`<div class="celekick">${kicker}</div>`:''}<h2>${title}</h2><div class="celetext">${text}</div>${stat?`<div class="celestat">${stat}</div>`:''}<button class="btn block" onclick="closeCele()">Ура!</button></div>`;
   requestAnimationFrame(()=>m.classList.add('open'));
   try{navigator.vibrate&&navigator.vibrate(big?[30,40,60]:25)}catch(e){}
   if(confetti&&!matchMedia('(prefers-reduced-motion: reduce)').matches) confettiBurst(big?220:120);
 }
-function closeCele(){const m=document.getElementById('cele'); if(m) m.classList.remove('open')}
+function closeCele(){const m=document.getElementById('cele'); if(m) m.classList.remove('open'); const f=window._afterCele; window._afterCele=null; if(f) setTimeout(f,450)}
 function confettiBurst(n){
   const c=document.createElement('canvas'); c.className='confetti'; document.body.appendChild(c);
   const W=c.width=innerWidth*devicePixelRatio, H=c.height=innerHeight*devicePixelRatio; const ctx=c.getContext('2d');
