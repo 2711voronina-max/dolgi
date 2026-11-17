@@ -564,6 +564,14 @@ details.hist .item b{opacity:.75}
 .swatches .sw.on{box-shadow:0 0 0 2px #0B1F26,0 0 0 4px #6FE6EA}
 div.f{display:block;margin:10px 0}
 div.f>span{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+.datewrap{position:relative}
+.datewrap input[type=date]{-webkit-appearance:none;appearance:none;display:block;width:100%;min-height:48px;padding-right:44px;text-align:left;color:var(--text)}
+.datewrap input[type=date]::-webkit-date-and-time-value{text-align:left}
+.datewrap input[type=date]::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.datewrap .dicon{position:absolute;right:14px;top:50%;width:20px;height:20px;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.datewrap .dph{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted);opacity:.7;pointer-events:none;display:none;font-size:17px}
+.datewrap.empty .dph{display:block}
+.datewrap.empty input{color:transparent}
 </style>
 </head>
 <body>
@@ -777,6 +785,7 @@ const I={
  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14l2 2 4-4"/></svg>',
  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M3.5 9.5h17M7 15h4"/></svg>',
  plan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19 9.5 12l4 3.5L20 6"/><path d="M15 6h5v5"/></svg>',
+ dcal:'<svg class="dicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',
  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
@@ -911,7 +920,7 @@ function setPlan(k,v){S.plan[k]=v;save();render()}
 /* ================== Листы ================== */
 function sheet(html){const sh=document.getElementById('sheet');sh.style.transform='';
   const noClose=typeof S!=='undefined'&&S.fresh;
-  sh.innerHTML='<div class="grab"></div>'+(noClose?'':'<button class="sheetx" onclick="closeSheet()" aria-label="Закрыть">✕</button>')+html;document.getElementById('sheetbg').classList.add('open')}
+  sh.innerHTML='<div class="grab"></div>'+(noClose?'':'<button class="sheetx" onclick="closeSheet()" aria-label="Закрыть">✕</button>')+html;sh.scrollTop=0;document.getElementById('sheetbg').classList.add('open')}
 (function(){const sh=document.getElementById('sheet');let y0=null,dy=0;
   sh.addEventListener('touchstart',e=>{if(sh.scrollTop>0||(typeof S!=='undefined'&&S.fresh))return;y0=e.touches[0].clientY;dy=0},{passive:true});
   sh.addEventListener('touchmove',e=>{if(y0==null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform=`translateY(${dy}px)`},{passive:true});
@@ -1005,14 +1014,20 @@ function vDebts(){
     h+=`</div>`;}
   const done=S.debts.filter(d=>d.balance<=0.5).sort((a,b)=>(b.closedAt||'')>(a.closedAt||'')?1:-1);
   if(done.length){ h+=`<details class="hist"><summary class="row"><span>История</span><span class="sub">${done.length} ${plural(done.length,'закрыт','закрыто','закрыто')} ›</span></summary><div class="card" style="padding:6px 20px">`;
-    for(const d of done){ const dt=d.closedAt?parseD(d.closedAt):null;
-      h+=`<div class="item tap" onclick="openDebt('${d.id}')"><div class="ico" style="background:${d.color||'#888'};opacity:.55">✓</div><div class="t"><b>${esc(d.name)}</b><span>закрыт${dt?' '+dt.getDate()+' '+MS[dt.getMonth()]+' '+dt.getFullYear():''}</span></div>${d.closedSum?`<b class="num muted">${fmt(d.closedSum)}</b>`:''}</div>`; }
+    for(const d of done){ const cm=closeMeta(d); const dt=cm.date;
+      h+=`<div class="item tap" onclick="openDebt('${d.id}')"><div class="ico" style="background:${d.color||'#888'};opacity:.55">✓</div><div class="t"><b>${esc(d.name)}</b><span>закрыт${dt?' '+dLong(dt):''}</span></div>${cm.sum?`<b class="num muted">${fmt(cm.sum)}</b>`:''}</div>`; }
     h+=`</div></details>`; }
   return h;
 }
+function closeMeta(d){ let date=d.closedAt, sum=d.closedSum;
+  if(!date||!sum){ const last=Object.entries(S.paid).filter(([k])=>k.startsWith(d.id+'|')).map(([k,v])=>v).filter(v=>v.at).sort((a,b)=>a.at<b.at?1:-1)[0];
+    if(last){ date=date||last.at; sum=sum||last.amt||last.d; } }
+  return {date:date?parseD(date):null,sum}; }
+const dLong=dt=>dt?dt.getDate()+' '+MS[dt.getMonth()]+' '+dt.getFullYear():'';
+function dateField(id,val,ph){ return `<div class="datewrap ${val?'':'empty'}"><input id="${id}" type="date" value="${val||''}" oninput="this.parentNode.classList.toggle('empty',!this.value)"><span class="dph">${ph||'дд.мм.гггг'}</span>${I.dcal}</div>`; }
 function closeEarly(id){ const d=S.debts.find(x=>x.id===id);
   sheet(`<h2>Закрыть ${d.kind==='personal'?'долг':'досрочно'}</h2><div class="small muted" style="line-height:1.5">${d.kind==='personal'?'Отметь, что всё отдано.':'Возьми точную сумму для полного погашения в приложении банка — она может немного отличаться из-за процентов за дни.'}</div>
-  <div class="grid2" style="margin-top:12px"><label class="f"><span>Сумма, ₽</span><input id="cea" inputmode="decimal" value="${Math.round(d.balance*100)/100}"></label><label class="f"><span>Дата</span><input id="ced" type="date" value="${ymd(today())}"></label></div>
+  <div class="grid2" style="margin-top:12px"><label class="f"><span>Сумма, ₽</span><input id="cea" inputmode="decimal" value="${Math.round(d.balance*100)/100}"></label><label class="f"><span>Дата</span>${dateField('ced',ymd(today()))}</label></div>
   <button class="btn block" onclick="doCloseEarly('${id}')">Закрыть ${esc(d.name)}</button>`); }
 function doCloseEarly(id){ const d=S.debts.find(x=>x.id===id); const a=num(cea.value)||d.balance; const dt=ced.value||ymd(today());
   S.paid[d.id+'|close-'+dt]={d:d.balance,amt:a,at:dt,pre:true,close:true};
@@ -1023,18 +1038,18 @@ function openDebt(id){
   const d=id?S.debts.find(x=>x.id===id):{id:'d'+Date.now(),name:'',kind:'loan',color:'#6B7C93',balance:0,apr:0,payment:0,day:1,schedule:[]};
   const isNew=!id; const pers=d.kind==='personal';
   const hist=Object.entries(S.paid).filter(([k])=>k.startsWith(d.id+'|')).sort().reverse().slice(0,6);
-  const info=(!isNew&&!pers&&d.apr>0)?`<div class="card small"><div class="row"><span class="muted">В проценты в месяц</span><b class="num">${rub(interestMonthly(d))}</b></div><div class="row" style="margin-top:6px"><span class="muted">В тело долга</span><b class="num">${rub(Math.max(0,d.payment-interestMonthly(d)))}</b></div></div>`:'';
+  const info=(!isNew&&!pers&&d.apr>0&&d.balance>0.5)?`<div class="card small"><div class="row"><span class="muted">В проценты в месяц</span><b class="num">${rub(interestMonthly(d))}</b></div><div class="row" style="margin-top:6px"><span class="muted">В тело долга</span><b class="num">${rub(Math.max(0,d.payment-interestMonthly(d)))}</b></div></div>`:'';
   const pp=(!isNew&&!pers&&!d.noPrepay&&d.balance>0)?`<div class="card"><div class="lbl">Внести досрочно</div><div class="row" style="gap:8px;margin-top:8px"><input id="ppa" inputmode="numeric" placeholder="Сумма, ₽"><button class="btn" onclick="applyPrepay('${d.id}')">Внести</button></div><div class="small muted" style="margin-top:6px">${d.prepayMode==='payment'?'Остаток уменьшится, платёж пересчитается на тот же срок':'Остаток уменьшится, срок сократится'}</div></div>`:'';
-  const closedInfo=!isNew&&d.balance<=0.5?`<div class="note-g" style="margin-top:12px"><b>Закрыт${d.closedAt?' '+parseD(d.closedAt).getDate()+' '+MS[parseD(d.closedAt).getMonth()]+' '+parseD(d.closedAt).getFullYear():''} 🎉</b>${d.closedSum?`<div class="small" style="margin-top:4px">Последний взнос ${rub(d.closedSum)}</div>`:''}<button class="btn ghost" style="padding:8px 0;font-size:14px" onclick="reopenDebt('${d.id}')">Вернуть в активные</button></div>`:'';
+  const cm=closeMeta(d); const closedInfo=!isNew&&d.balance<=0.5?`<div class="note-g" style="margin-top:12px"><b>Закрыт${cm.date?' '+dLong(cm.date):''} 🎉</b>${cm.sum?`<div class="small" style="margin-top:4px">Последний взнос ${rub(cm.sum)}</div>`:''}<button class="btn ghost" style="padding:8px 0;font-size:14px" onclick="reopenDebt('${d.id}')">Вернуть в активные</button></div>`:'';
   const ce=!isNew&&d.balance>0.5?`<button class="btn sec block" style="margin-top:12px" onclick="closeEarly('${d.id}')">${d.kind==='personal'?'Отдала полностью':'Закрыть досрочно'}</button>`:'';
   sheet(`<h2>${isNew?'Новый долг':esc(d.name)}</h2>${d.note?`<div class="small muted">${esc(d.note)}</div>`:''}${closedInfo}${info}${pp}${ce}
-  <label class="f"><span>Название</span><input id="fn" value="${esc(d.name)}"></label>
+  <label class="f"><span>Название</span><input id="fn" value="${esc(d.name)}" placeholder="Например, Совкомбанк"></label>
   <div class="f"><span>Цвет</span><div class="swatches"><input type="hidden" id="fc" value="${d.color||'#6B7C93'}">${['#1E3A8A','#2F6FDE','#1F9D55','#E3B505','#E8452C','#C2185B','#9C6ADE','#E76F51','#1F1F23','#6B7C93'].map(c=>`<button type="button" class="sw ${(d.color||'').toUpperCase()===c?'on':''}" style="background:${c}" onclick="fc.value='${c}';this.parentNode.querySelectorAll('.sw').forEach(x=>x.classList.remove('on'));this.classList.add('on')" aria-label="Цвет"></button>`).join('')}</div></div>
   <label class="f"><span>Тип</span><select id="fk">${Object.entries(kindName).map(([k,n])=>`<option value="${k}" ${d.kind===k?'selected':''}>${n}</option>`).join('')}</select></label>
-  <div class="grid2"><label class="f"><span>Остаток, ₽</span><input id="fb" inputmode="decimal" value="${Math.round(d.balance*100)/100}"></label><label class="f"><span>Ставка, %</span><input id="fa" inputmode="decimal" value="${d.apr}"></label>
-  <label class="f"><span>Платёж, ₽</span><input id="fp" inputmode="decimal" value="${d.payment||0}"></label><label class="f"><span>День платежа</span><input id="fd" inputmode="numeric" value="${d.day||1}"></label></div>
-  ${!pers?`<label class="f"><span>Первый платёж (если ещё не начались)</span><input id="ffp" type="date" value="${d.firstPay||''}"></label>`:''}
-  <label class="f"><span>Каникулы до (необязательно)</span><input id="fh" type="date" value="${d.holidayUntil||''}"></label>
+  <div class="grid2"><label class="f"><span>Остаток, ₽</span><input id="fb" inputmode="decimal" value="${isNew?'':Math.round(d.balance*100)/100}" placeholder="180 000"></label><label class="f"><span>Ставка, %</span><input id="fa" inputmode="decimal" value="${isNew?'':d.apr}" placeholder="19,9"></label>
+  <label class="f"><span>Платёж, ₽</span><input id="fp" inputmode="decimal" value="${isNew?'':d.payment||0}" placeholder="6 900"></label><label class="f"><span>День платежа</span><input id="fd" inputmode="numeric" value="${isNew?'':d.day||1}" placeholder="1–31"></label></div>
+  ${!pers?`<label class="f"><span>Первый платёж (если ещё не начались)</span>${dateField('ffp',d.firstPay)}</label>`:''}
+  <label class="f"><span>Каникулы до (необязательно)</span>${dateField('fh',d.holidayUntil)}</label>
   ${!pers?`<label class="f"><span>Досрочное погашение</span><select id="fpm"><option value="term" ${d.prepayMode!=='payment'?'selected':''}>уменьшает срок</option><option value="payment" ${d.prepayMode==='payment'?'selected':''}>уменьшает ежемесячный платёж</option></select></label>`:''}
   <label class="check"><input type="checkbox" id="fnp" ${d.noPrepay?'checked':''}><span>Не гасить досрочно (только по графику)</span></label>
   <label class="check"><input type="checkbox" id="fcs" ${d.canShift?'checked':''}><span>Платежи можно переносить (для личных долгов)</span></label>
@@ -1107,6 +1122,7 @@ function planTips(){
 function openTips(){sheet(`<h2>Подсказки</h2>`+planTips().map(([i,t,d])=>`<div class="card" style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:22px">${i}</div><div><b>${t}</b><div class="small muted" style="margin-top:4px;line-height:1.45">${d}</div></div></div>`).join(''))}
 
 /* ================== Деньги ================== */
+const APP_VERSION='1.8';
 function vMe(){
   const t=today();
   let h=``+header('Профиль')+`<div class="card" style="padding:6px 20px;margin-top:14px"><div class="item tap" onclick="openName()"><div class="ico" style="background:linear-gradient(135deg,#1F7A87,#2C97A1);border-radius:50%">${esc((S.name||'?')[0])}</div><div class="t"><b>${esc(S.name||'Как тебя зовут?')}</b><span>имя для приветствия</span></div></div></div><div class="sub" style="margin-top:14px">Доход и бюджет на жизнь — из них считается «свободно» и план погашения</div><h2>Доход</h2><div class="card" style="padding:6px 20px">`;
@@ -1117,6 +1133,7 @@ function vMe(){
   h+=`<h2>Настройки</h2><div class="card small"><p style="margin-top:0">Всё хранится только на этом устройстве. Сохрани копию, чтобы не потерять.</p><p class="muted" style="margin-top:-4px">Сейчас: ${dataSummary()}</p>
    <div class="row" style="gap:8px"><button class="btn sec block" onclick="copyBackup()">Сохранить копию</button><button class="btn sec block" onclick="openRestore()">Восстановить</button></div>
    <button class="btn sec block" style="margin-top:12px" onclick="icsExport()">📅 Напоминания о платежах в Календарь</button><button class="btn ghost" style="color:var(--danger)" onclick="openReset()">Стереть все данные</button></div>`;
+  h+=`<div class="small muted" style="text-align:center;margin:28px 0 8px;opacity:.6">Версия ${APP_VERSION}</div>`;
   return h;
 }
 let openCat=null, newCatMode=false;
@@ -1152,7 +1169,7 @@ function openSpend(eid){
   if(eid) spendCat=eid; if(!spendCat||!S.expenses.find(e=>e.id===spendCat)) spendCat=(S.expenses[0]||{}).id;
   sheet(`<h2>Новый расход</h2><label class="f"><span>Сумма, ₽</span><input id="spa" inputmode="decimal" placeholder="0" autofocus></label>
   <div class="lbl" style="margin:6px 0 8px">Категория</div><div style="display:flex;flex-wrap:wrap;gap:8px">${S.expenses.map(e=>`<button class="chip ${spendCat===e.id?'on':''}" style="padding:8px 14px" onclick="spendCat='${e.id}';[...this.parentNode.children].forEach(b=>b.classList.remove('on'));this.classList.add('on')">${esc(e.name.split(' (')[0])}</button>`).join('')}</div>
-  <label class="f" style="margin-top:6px"><span>Дата</span><input id="spd" type="date" value="${ymd(today())}"></label>
+  <label class="f" style="margin-top:6px"><span>Дата</span>${dateField('spd',ymd(today()))}</label>
   <button class="btn block" style="margin-top:6px" onclick="addSpend()">Записать</button>`);
   setTimeout(()=>{const i=document.getElementById('spa');i&&i.focus()},300);
 }
@@ -1431,6 +1448,7 @@ function checkMilestone(){
   return false;
 }
 function celebrateClose(d,sum){
+  if(!d.closedAt){ const cm=closeMeta(d); d.closedAt=ymd(today()); d.closedSum=sum||cm.sum; save(); }
   const left=S.debts.filter(x=>x.kind!=='mortgage'&&x.balance>0.5).length;
   const saved=d.apr>0?` Больше никаких ${fmtApr(d.apr)} годовых.`:'';
   celebrate({emoji:'🎉',kicker:'Минус один долг',title:d.kind==='personal'?`${esc(d.name)} — всё отдано!`:`Прощай, ${esc(d.name)}!`,text:d.kind==='personal'?`${esc(d.name)} — всё отдано. Ты это сделала! Это большая победа — отметь её.`:`Кредит закрыт полностью.${saved} Ты это сделала — это большая победа, отметь её.`,stat:(sum?`Внесено ${rub(sum)} · `:'')+(left?`Осталось ${left} ${plural(left,'долг','долга','долгов')} без ипотеки`:'Все долги кроме ипотеки закрыты 🥳'),confetti:true,big:true});
