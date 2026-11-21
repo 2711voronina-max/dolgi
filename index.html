@@ -686,7 +686,7 @@ function personalForMonth(key){
 const isPaid=k=>!!S.paid[k];
 function togglePaidKey(k){
   const [id,ds]=k.split('|'); const d=S.debts.find(x=>x.id===id);
-  if(S.paid[k]){ d.balance+=S.paid[k].d; delete S.paid[k]; save(); render(); return; }
+  if(S.paid[k]){ const pr=S.paid[k]; d.balance+=pr.d; if(pr.carry){ const n=(d.schedule||[]).find(x=>x.m===pr.carry.m); if(n){ n.a-=pr.carry.a; if(n.a<=0.5) d.schedule=d.schedule.filter(x=>x!==n); } } delete S.paid[k]; save(); render(); return; }
   let amt, principal;
   if(d.kind==='personal'){ amt=(d.schedule.find(s=>s.m===ds)||{a:0}).a; principal=Math.min(amt,d.balance); }
   else { amt=Math.min(d.payment,d.balance||d.payment); principal=Math.max(0,Math.min(d.balance,amt-interestMonthly(d))); }
@@ -939,11 +939,25 @@ function openPay(k){
   const amt=d.kind==='personal'?(d.schedule.find(s=>s.m===ds)||{a:0}).a:Math.min(d.payment,d.balance||d.payment);
   const when=d.kind==='personal'?'в '+MONTHS_P[mi(ds)]:parseD(ds).getDate()+' '+MONTHS[parseD(ds).getMonth()];
   sheet(`<div class="row"><div class="ico" style="background:${d.color}">${esc(d.name[0])}</div><div style="flex:1"><h2 style="margin:0">${esc(d.name)}</h2><div class="sub">${when}</div></div></div>
-  <div class="card"><div class="lbl">Платёж</div><div class="big num">${rub(amt)}</div>${d.apr>0?`<div class="small muted" style="margin-top:6px">из них ~${rub(interestMonthly(d))} проценты, ~${rub(Math.max(0,amt-interestMonthly(d)))} в долг</div>`:''}</div>
-  <button class="btn block" onclick="togglePaidKey('${k}');closeSheet()">${pd?'Снять отметку':'Отметить оплаченным'}</button>
-  ${d.canShift&&!pd?`<button class="btn sec block" style="margin-top:8px" onclick="shiftOne('${d.id}','${ds}')">Перенести на ${MONTHS_N[mi(nextKey(ds))]}</button>`:''}
+  ${d.kind==='personal'&&!pd?`<div class="card"><div class="lbl">План на месяц — ${rub(amt)}</div><label class="f" style="margin-top:10px"><span>Сколько отдала</span><input id="ppa" inputmode="decimal" value="${amt}"></label><div class="small muted" style="line-height:1.45">Если меньше плана — разницу перенесу на ${MONTHS_N[mi(nextKey(ds))]}. Ничего не отдала — поставь 0.</div></div><button class="btn block" onclick="payPersonal('${k}')">Записать</button>`:''}
+  ${d.kind==='personal'&&pd?`<div class="card"><div class="lbl">Отдала</div><div class="big num">${rub(S.paid[k].amt)}</div>${S.paid[k].plan&&S.paid[k].amt!==S.paid[k].plan?`<div class="small muted" style="margin-top:6px">план был ${rub(S.paid[k].plan)}${S.paid[k].carry?` · ${rub(S.paid[k].carry.a)} перенесено на ${MONTHS_N[mi(S.paid[k].carry.m)]}`:''}</div>`:''}<div class="small muted" style="margin-top:6px">Осталось по долгу ${rub(d.balance)}</div></div>`:''}
+  ${d.kind!=='personal'?`<div class="card"><div class="lbl">Платёж</div><div class="big num">${rub(amt)}</div>${d.apr>0?`<div class="small muted" style="margin-top:6px">из них ~${rub(interestMonthly(d))} проценты, ~${rub(Math.max(0,amt-interestMonthly(d)))} в долг</div>`:''}</div>`:''}
+  ${d.kind!=='personal'||pd?`<button class="btn ${pd?'sec':''} block" onclick="togglePaidKey('${k}');closeSheet()">${pd?'Снять отметку':'Отметить оплаченным'}</button>`:''}
+  ${d.canShift&&!pd&&d.kind!=='personal'?`<button class="btn sec block" style="margin-top:8px" onclick="shiftOne('${d.id}','${ds}')">Перенести на ${MONTHS_N[mi(nextKey(ds))]}</button>`:''}
   <button class="btn ghost block" onclick="closeSheet();openDebt('${d.id}')">Открыть долг</button>`);
 }
+function persPayFromDebt(id){ const d=S.debts.find(x=>x.id===id); const k=id+'|'+ym(today());
+  if((d.schedule||[]).find(x=>x.m===ym(today())&&x.a>0)&&!isPaid(k)){ closeSheet(); setTimeout(()=>openPay(k),250); return; }
+  sheet(`<h2>${esc(d.name)}</h2><div class="small muted">Осталось ${rub(d.balance)}</div><label class="f" style="margin-top:12px"><span>Сколько отдала</span><input id="pfa" inputmode="decimal" placeholder="5 000"></label><button class="btn block" onclick="payFree('${id}')">Записать</button>`); setTimeout(()=>{const i=document.getElementById('pfa');i&&i.focus()},300); }
+function payFree(id){ const d=S.debts.find(x=>x.id===id); const a=num(document.getElementById('pfa').value); if(!a){toast('Введи сумму');return}
+  const pr=Math.min(a,d.balance); const before=d.balance; d.balance-=pr; S.paid[id+'|extra-'+Date.now()]={d:pr,amt:a,at:ymd(today()),pre:true}; save(); closeSheet(); render(); afterPay(d,before,a); }
+function payPersonal(k){ const [id,ds]=k.split('|'); const d=S.debts.find(x=>x.id===id);
+  const plan=(d.schedule.find(x=>x.m===ds)||{a:0}).a; const raw=document.getElementById('ppa').value.trim(); if(raw===''){toast('Введи сумму');return} const a=Math.max(0,num(raw)); if(!a){ shiftOne(id,ds); return }
+  const principal=Math.min(a,d.balance); const before=d.balance; d.balance-=principal;
+  const rec={d:principal,amt:a,plan,at:ymd(today())}; const short=Math.round((plan-a)*100)/100;
+  if(short>0.5&&d.balance>0.5){ const nk=nextKey(ds); let n=d.schedule.find(x=>x.m===nk); if(!n){n={m:nk,a:0};d.schedule.push(n)} const c=Math.min(short,d.balance); n.a+=c; rec.carry={m:nk,a:c}; d.schedule.sort((x,y)=>x.m<y.m?-1:1); }
+  S.paid[k]=rec; save(); closeSheet(); render();
+  if(rec.carry) toast(`Записала ${rub(a)}. Остаток ${rub(rec.carry.a)} перенесла на ${MONTHS_N[mi(rec.carry.m)]}`); else afterPay(d,before,a); }
 function shiftOne(id,key){const d=S.debts.find(x=>x.id===id);const e=d.schedule.find(s=>s.m===key);const nk=nextKey(key);let n=d.schedule.find(s=>s.m===nk);if(!n){n={m:nk,a:0};d.schedule.push(n)}n.a+=e.a;e.a=0;d.schedule=d.schedule.filter(s=>s.a>0).sort((a,b)=>a.m<b.m?-1:1);save();closeSheet();render();toast('Перенесено на '+MONTHS_N[mi(nk)])}
 
 function openIncome(incId,key){
@@ -993,7 +1007,7 @@ function vPay(){
     }
     const pers=personalForMonth(key);
     if(pers.length){ h+=`<div class="card"><div class="row"><b>Личные долги</b><span class="pill">откуда получится</span></div>`;
-      for(const o of pers){ const pd=isPaid(o.key); h+=`<div class="item ${pd?'done':''}"><button class="chk ${pd?'on':''}" onclick="togglePaidKey('${o.key}')"></button><div class="t" onclick="openPay('${o.key}')" style="cursor:pointer"><b>${esc(o.debt.name)}</b><span>${o.debt.canShift?'можно перенести':'по договорённости'}</span></div><b class="num">${fmt(o.amount)}</b></div>`;}
+      for(const o of pers){ const pd=isPaid(o.key); const pr=S.paid[o.key]; h+=`<div class="item ${pd?'done':''}"><button class="chk ${pd?'on':''}" onclick="${pd?`togglePaidKey('${o.key}')`:`openPay('${o.key}')`}"></button><div class="t" onclick="openPay('${o.key}')" style="cursor:pointer"><b>${esc(o.debt.name)}</b><span>${pd&&pr.plan&&pr.amt!==pr.plan?`отдала ${fmt(pr.amt)} из ${fmt(pr.plan)}`:(o.debt.canShift?'можно перенести':'по договорённости')}</span></div><b class="num" style="cursor:pointer" onclick="openPay('${o.key}')">${fmt(pd&&pr.amt?pr.amt:o.amount)}</b></div>`;}
       h+=`</div>`;}
   }
   return h;
@@ -1046,7 +1060,7 @@ function openDebt(id){
   const info=(!isNew&&!pers&&d.apr>0&&d.balance>0.5)?`<div class="card small"><div class="row"><span class="muted">В проценты в месяц</span><b class="num">${rub(interestMonthly(d))}</b></div><div class="row" style="margin-top:6px"><span class="muted">В тело долга</span><b class="num">${rub(Math.max(0,d.payment-interestMonthly(d)))}</b></div></div>`:'';
   const pp=(!isNew&&!pers&&!d.noPrepay&&d.balance>0)?`<div class="card"><div class="lbl">Внести досрочно</div><div class="row" style="gap:8px;margin-top:8px"><input id="ppa" inputmode="numeric" placeholder="Сумма, ₽"><button class="btn" onclick="applyPrepay('${d.id}')">Внести</button></div><div class="small muted" style="margin-top:6px">${d.prepayMode==='payment'?'Остаток уменьшится, платёж пересчитается на тот же срок':'Остаток уменьшится, срок сократится'}</div></div>`:'';
   const cm=closeMeta(d); const closedInfo=!isNew&&d.balance<=0.5?`<div class="note-g" style="margin-top:12px"><b>Закрыт${cm.date?' '+dLong(cm.date):''} 🎉</b>${cm.sum?`<div class="small" style="margin-top:4px">Последний взнос ${rub(cm.sum)}</div>`:''}<button class="btn ghost" style="padding:8px 0;font-size:14px" onclick="reopenDebt('${d.id}')">Вернуть в активные</button></div>`:'';
-  const ce=!isNew&&d.balance>0.5?`<button class="btn sec block" style="margin-top:12px" onclick="closeEarly('${d.id}')">${d.kind==='personal'?'Отдала полностью':'Закрыть досрочно'}</button>`:'';
+  const ce=!isNew&&d.balance>0.5?`${d.kind==='personal'?`<button class="btn block" style="margin-top:12px" onclick="persPayFromDebt('${d.id}')">Записать, сколько отдала</button>`:''}<button class="btn sec block" style="margin-top:${d.kind==='personal'?8:12}px" onclick="closeEarly('${d.id}')">${d.kind==='personal'?'Отдала полностью':'Закрыть досрочно'}</button>`:'';
   sheet(`<h2>${isNew?'Новый долг':esc(d.name)}</h2>${d.note?`<div class="small muted">${esc(d.note)}</div>`:''}${closedInfo}${info}${pp}${ce}
   <label class="f"><span>Название</span><input id="fn" value="${esc(d.name)}" placeholder="Например, Совкомбанк"></label>
   <div class="f"><span>Цвет</span><div class="swatches"><input type="hidden" id="fc" value="${d.color||'#6B7C93'}">${['#1E3A8A','#2F6FDE','#1F9D55','#E3B505','#E8452C','#C2185B','#9C6ADE','#E76F51','#1F1F23','#6B7C93'].map(c=>`<button type="button" class="sw ${(d.color||'').toUpperCase()===c?'on':''}" style="background:${c}" onclick="fc.value='${c}';this.parentNode.querySelectorAll('.sw').forEach(x=>x.classList.remove('on'));this.classList.add('on')" aria-label="Цвет"></button>`).join('')}</div></div>
@@ -1145,7 +1159,7 @@ function spendHistory(){ const ps=pastPeriods(); if(!ps.length) return '';
         return `<div class="hrow"><div class="row"><span>${esc(e?e.name.split(' (')[0]:'Удалённая категория')}</span><span><b class="num">${fmt(v)} ₽</b>${dv!=null&&Math.abs(dv)>=1?` <span class="small" style="color:${dv>0?'var(--warn)':'#6FE6EA'}">${dv>0?'+':'−'}${fmt(Math.abs(dv))}</span>`:''}</span></div><div class="hbar"><i style="width:${Math.max(3,v/mx*100)}%"></i></div></div>`}).join(''):'<div class="small muted">Трат не записано</div>'}${prev?'<div class="small muted" style="margin-top:8px">± — разница с предыдущим периодом</div>':''}</div>`; }
   });
   return h+`</div>`; }
-const APP_VERSION='1.9';
+const APP_VERSION='1.10';
 function vMe(){
   const t=today();
   let h=``+header('Профиль')+`<div class="card" style="padding:6px 20px;margin-top:14px"><div class="item tap" onclick="openName()"><div class="ico" style="background:linear-gradient(135deg,#1F7A87,#2C97A1);border-radius:50%">${esc((S.name||'?')[0])}</div><div class="t"><b>${esc(S.name||'Как тебя зовут?')}</b><span>имя для приветствия</span></div></div></div><div class="sub" style="margin-top:14px">Доход и бюджет на жизнь — из них считается «свободно» и план погашения</div><h2>Доход</h2><div class="card" style="padding:6px 20px">`;
@@ -1401,7 +1415,7 @@ function vCal(m){
     h+=`</div>`;}
   const pers=personalForMonth(key);
   if(pers.length){ h+=`<h2>Без даты · ${MONTHS_N[mo]}</h2><div class="card" style="padding:6px 20px">`;
-    for(const o of pers){ const pd=isPaid(o.key); h+=`<div class="item ${pd?'done':''}"><button class="chk ${pd?'on':''}" onclick="togglePaidKey('${o.key}')"></button><div class="t" onclick="openPay('${o.key}')" style="cursor:pointer"><b>${esc(o.debt.name)}</b><span>${o.debt.canShift?'можно перенести':'по договорённости'}</span></div><b class="num">${fmt(o.amount)}</b></div>`;}
+    for(const o of pers){ const pd=isPaid(o.key); const pr=S.paid[o.key]; h+=`<div class="item ${pd?'done':''}"><button class="chk ${pd?'on':''}" onclick="${pd?`togglePaidKey('${o.key}')`:`openPay('${o.key}')`}"></button><div class="t" onclick="openPay('${o.key}')" style="cursor:pointer"><b>${esc(o.debt.name)}</b><span>${pd&&pr.plan&&pr.amt!==pr.plan?`отдала ${fmt(pr.amt)} из ${fmt(pr.plan)}`:(o.debt.canShift?'можно перенести':'по договорённости')}</span></div><b class="num" style="cursor:pointer" onclick="openPay('${o.key}')">${fmt(pd&&pr.amt?pr.amt:o.amount)}</b></div>`;}
     h+=`</div>`;}
   return h;
 }
