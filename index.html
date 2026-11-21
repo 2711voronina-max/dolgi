@@ -572,6 +572,11 @@ div.f>span{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
 .datewrap .dph{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted);opacity:.7;pointer-events:none;display:none;font-size:17px}
 .datewrap.empty .dph{display:block}
 .datewrap.empty input{color:transparent}
+.hdet{padding:4px 0 14px}
+.hrow{padding:7px 0}
+.hrow .row{font-size:15px}
+.hbar{height:6px;border-radius:3px;background:rgba(255,255,255,.07);margin-top:6px;overflow:hidden}
+.hbar i{display:block;height:100%;border-radius:3px;background:var(--grad)}
 </style>
 </head>
 <body>
@@ -1122,7 +1127,25 @@ function planTips(){
 function openTips(){sheet(`<h2>Подсказки</h2>`+planTips().map(([i,t,d])=>`<div class="card" style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:22px">${i}</div><div><b>${t}</b><div class="small muted" style="margin-top:4px;line-height:1.45">${d}</div></div></div>`).join(''))}
 
 /* ================== Деньги ================== */
-const APP_VERSION='1.8';
+let openHist=null;
+function pastPeriods(){ const sp=S.spend||[]; if(!sp.length) return [];
+  const first=sp.map(x=>x.date).sort()[0]; const out=[]; let per=periodOf(today());
+  for(let i=0;i<48;i++){ const prev=periodOf(new Date(per.start.getFullYear(),per.start.getMonth(),per.start.getDate()-1)); if(ymd(prev.end)<first) break; out.push(prev); per=prev; }
+  return out; }
+function spendHistory(){ const ps=pastPeriods(); if(!ps.length) return '';
+  const bud=budget()/2; const rows=ps.map(p=>{const a=ymd(p.start),b=ymd(p.end); const recs=(S.spend||[]).filter(x=>x.date>=a&&x.date<=b); return {p,recs,sum:recs.reduce((s,x)=>s+x.amount,0)}});
+  let h=`<h2>Расходы по периодам</h2><div class="card" style="padding:6px 20px">`;
+  rows.forEach((r,i)=>{ const k=ymd(r.p.start); const prev=rows[i+1]; const d=prev?r.sum-prev.sum:null; const over=r.sum>bud;
+    const lbl=`${r.p.start.getDate()} ${MS[r.p.start.getMonth()]} – ${r.p.end.getDate()} ${MS[r.p.end.getMonth()]}`;
+    h+=`<div class="item tap" onclick="openHist=openHist==='${k}'?null:'${k}';render()"><div class="t"><b>${lbl}</b><span>${over?`<span style="color:var(--warn)">больше бюджета на ${rub(r.sum-bud)}</span>`:`в бюджете, осталось ${rub(bud-r.sum)}`}</span></div><div style="text-align:right"><b class="num">${fmt(r.sum)} ₽</b>${d!=null&&Math.abs(d)>=1?`<div class="small" style="color:${d>0?'var(--warn)':'#6FE6EA'}">${d>0?'+':'−'}${fmt(Math.abs(d))}</div>`:''}</div></div>`;
+    if(openHist===k){ const by={}; r.recs.forEach(x=>by[x.exp]=(by[x.exp]||0)+x.amount);
+      const pb={}; if(prev) prev.recs.forEach(x=>pb[x.exp]=(pb[x.exp]||0)+x.amount);
+      const list=Object.entries(by).sort((a,b)=>b[1]-a[1]); const mx=list.length?list[0][1]:1;
+      h+=`<div class="hdet">${list.length?list.map(([id,v])=>{const e=S.expenses.find(x=>x.id===id); const dv=prev?v-(pb[id]||0):null;
+        return `<div class="hrow"><div class="row"><span>${esc(e?e.name.split(' (')[0]:'Удалённая категория')}</span><span><b class="num">${fmt(v)} ₽</b>${dv!=null&&Math.abs(dv)>=1?` <span class="small" style="color:${dv>0?'var(--warn)':'#6FE6EA'}">${dv>0?'+':'−'}${fmt(Math.abs(dv))}</span>`:''}</span></div><div class="hbar"><i style="width:${Math.max(3,v/mx*100)}%"></i></div></div>`}).join(''):'<div class="small muted">Трат не записано</div>'}${prev?'<div class="small muted" style="margin-top:8px">± — разница с предыдущим периодом</div>':''}</div>`; }
+  });
+  return h+`</div>`; }
+const APP_VERSION='1.9';
 function vMe(){
   const t=today();
   let h=``+header('Профиль')+`<div class="card" style="padding:6px 20px;margin-top:14px"><div class="item tap" onclick="openName()"><div class="ico" style="background:linear-gradient(135deg,#1F7A87,#2C97A1);border-radius:50%">${esc((S.name||'?')[0])}</div><div class="t"><b>${esc(S.name||'Как тебя зовут?')}</b><span>имя для приветствия</span></div></div></div><div class="sub" style="margin-top:14px">Доход и бюджет на жизнь — из них считается «свободно» и план погашения</div><h2>Доход</h2><div class="card" style="padding:6px 20px">`;
@@ -1130,6 +1153,7 @@ function vMe(){
     h+=`<div class="item incrow"><div class="t"><b>${esc(i.name)} · ${i.day}-го</b><span>план <span class="edit" style="color:var(--text);cursor:pointer" onclick="openIncomePlan()">${fmt(i.amount)} ₽</span></span></div><label class="factf"><span>факт в ${MONTHS_P[t.getMonth()]}</span><input inputmode="numeric" placeholder="${fmt(i.amount)}" value="${fact!=null?fmt(fact):''}" onfocus="this.select()" onchange="const v=this.value.trim();if(v===''){delete S.actual['${incKey(i,key)}']}else{S.actual['${incKey(i,key)}']=num(v)};save();render();toast('Сохранено')"></label></div>`});
   h+=`</div>`;
   h+=`<h2>Бюджет на жизнь</h2><div class="card" style="padding:6px 20px"><div class="item incrow"><div class="t"><b>В месяц</b><span>всё, кроме долгов</span></div><label class="factf"><span>₽ / мес</span><input inputmode="numeric" value="${fmt(budget())}" onfocus="this.select()" onchange="S.livingBudget=num(this.value);save();render();toast('Бюджет обновлён, план пересчитан')"></label></div></div>`;
+  h+=spendHistory();
   h+=`<h2>Настройки</h2><div class="card small"><p style="margin-top:0">Всё хранится только на этом устройстве. Сохрани копию, чтобы не потерять.</p><p class="muted" style="margin-top:-4px">Сейчас: ${dataSummary()}</p>
    <div class="row" style="gap:8px"><button class="btn sec block" onclick="copyBackup()">Сохранить копию</button><button class="btn sec block" onclick="openRestore()">Восстановить</button></div>
    <button class="btn sec block" style="margin-top:12px" onclick="icsExport()">📅 Напоминания о платежах в Календарь</button><button class="btn ghost" style="color:var(--danger)" onclick="openReset()">Стереть все данные</button></div>`;
