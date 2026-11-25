@@ -684,6 +684,8 @@ function personalForMonth(key){
   return out;
 }
 const isPaid=k=>!!S.paid[k];
+const paidAmt=(k,f)=>S.paid[k]&&S.paid[k].amt!=null?S.paid[k].amt:f;
+function persExtras(per){ const a=ymd(per.start),b=ymd(per.end); return Object.entries(S.paid).filter(([k,v])=>k.includes('|extra-')&&v.at>=a&&v.at<=b&&(S.debts.find(d=>d.id===k.split('|')[0])||{}).kind==='personal').reduce((s,[k,v])=>s+v.amt,0); }
 function togglePaidKey(k){
   const [id,ds]=k.split('|'); const d=S.debts.find(x=>x.id===id);
   if(S.paid[k]){ const pr=S.paid[k]; d.balance+=pr.d; if(pr.carry){ const n=(d.schedule||[]).find(x=>x.m===pr.carry.m); if(n){ n.a-=pr.carry.a; if(n.a<=0.5) d.schedule=d.schedule.filter(x=>x!==n); } } delete S.paid[k]; save(); render(); return; }
@@ -1159,7 +1161,7 @@ function spendHistory(){ const ps=pastPeriods(); if(!ps.length) return '';
         return `<div class="hrow"><div class="row"><span>${esc(e?e.name.split(' (')[0]:'Удалённая категория')}</span><span><b class="num">${fmt(v)} ₽</b>${dv!=null&&Math.abs(dv)>=1?` <span class="small" style="color:${dv>0?'var(--warn)':'#6FE6EA'}">${dv>0?'+':'−'}${fmt(Math.abs(dv))}</span>`:''}</span></div><div class="hbar"><i style="width:${Math.max(3,v/mx*100)}%"></i></div></div>`}).join(''):'<div class="small muted">Трат не записано</div>'}${prev?'<div class="small muted" style="margin-top:8px">± — разница с предыдущим периодом</div>':''}</div>`; }
   });
   return h+`</div>`; }
-const APP_VERSION='1.10';
+const APP_VERSION='1.11';
 function vMe(){
   const t=today();
   let h=``+header('Профиль')+`<div class="card" style="padding:6px 20px;margin-top:14px"><div class="item tap" onclick="openName()"><div class="ico" style="background:linear-gradient(135deg,#1F7A87,#2C97A1);border-radius:50%">${esc((S.name||'?')[0])}</div><div class="t"><b>${esc(S.name||'Как тебя зовут?')}</b><span>имя для приветствия</span></div></div></div><div class="sub" style="margin-top:14px">Доход и бюджет на жизнь — из них считается «свободно» и план погашения</div><h2>Доход</h2><div class="card" style="padding:6px 20px">`;
@@ -1248,7 +1250,7 @@ function spendPace(per){const t=today(); const ps=ymd(per.start), pe=ymd(per.end
   const expect=bud*passed/total; const over=spent>bud; const fast=!over&&spent>expect+bud*0.1&&spent>bud*0.4;
   return {spent,bud,over,fast,days,pctB:Math.round(spent/bud*100),pctT:Math.round(passed/total*100),perDay:Math.max(0,(bud-spent)/days),end:`${per.end.getDate()} ${MS[per.end.getMonth()]}`};}
 function willLeftNow(){const t=today(); const per=periodOf(t); const perKey=ym(new Date(t.getFullYear(),t.getMonth()+(per.type==='adv'&&t.getDate()<10?-1:0),1));
-  const due=occurrences(per.start,per.end).reduce((s,o)=>s+o.amount,0); const persPaid=personalForMonth(perKey).filter(p=>isPaid(p.key)).reduce((s,p)=>s+p.amount,0);
+  const due=occurrences(per.start,per.end).reduce((s,o)=>s+o.amount,0); const persPaid=personalForMonth(perKey).filter(p=>isPaid(p.key)).reduce((s,p)=>s+paidAmt(p.key,p.amount),0)+persExtras(per);
   const pc=spendPace(per); return incomeFor(per.inc,perKey)-due-persPaid-Math.max(pc.bud,pc.spent);}
 function paceNote(pc,willLeft){
   if(pc.over) return `<div class="note-y" style="margin:16px 0 0"><div class="ni">!</div><div style="flex:1"><b>Траты вышли за бюджет на ${rub(pc.spent-pc.bud)}</b><div class="small" style="margin-top:6px;line-height:1.45">${willLeft>=0?`Новых долгов не будет: к ${pc.end} всё равно останется ${rub(willLeft)}. Просто досрочки в этом месяце будет меньше — план уже пересчитался.`:`К ${pc.end} не хватит ${rub(-willLeft)}. До конца периода лучше только самое нужное — и не трогать кредитки.`}</div></div></div>`;
@@ -1257,7 +1259,7 @@ function paceNote(pc,willLeft){
 function periodCard(per,perKey){
   const t=today(); const occ=occurrences(per.start,per.end); const due=occ.reduce((s,o)=>s+o.amount,0);
   const paidList=occ.filter(o=>isPaid(o.key)); const paid=paidList.reduce((s,o)=>s+o.amount,0);
-  const pers=personalForMonth(perKey).filter(p=>isPaid(p.key)); const persPaid=pers.reduce((s,p)=>s+p.amount,0);
+  const pers=personalForMonth(perKey).filter(p=>isPaid(p.key)); const persPaid=pers.reduce((s,p)=>s+paidAmt(p.key,p.amount),0)+persExtras(per);
   const got=incomeFor(per.inc,perKey); const fact=S.actual[incKey(per.inc,perKey)]!=null;
   const ps=ymd(per.start), pe=ymd(per.end);
   const inPer=x=>x.date>=ps&&x.date<=pe;
